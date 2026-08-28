@@ -3,7 +3,7 @@ main:
     sb   x11, 1029(x0)
 
 loop:
-    addi x12, x0, 128
+    addi x12, x0, 64
     beq  x11, x12, fim
 
 espera_pressionar:
