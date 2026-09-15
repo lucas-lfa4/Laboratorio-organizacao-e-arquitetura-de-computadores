@@ -1,0 +1,41 @@
+vsim -gui work.sc_cpu_tb
+# vsim -gui work.sc_cpu_tb 
+# Start time: 10:49:19 on Sep 15,2026
+# Loading sv_std.std
+# Loading work.sc_cpu_tb
+# Loading work.sc_cpu
+# Loading work.sc_control
+# Loading work.sc_datapath
+# Loading work.sc_imem
+# Loading work.sc_regfile
+# Loading work.sc_sign_ext
+# Loading work.sc_alu_ctrl
+# Loading work.sc_alu
+# Loading work.sc_dmem
+add wave sim:/sc_cpu_tb/*
+run -all
+# TIMEOUT: halt not reached after 60 cycles.
+# ** Note: $finish    : D:/Users/csm6/Documents/GitHub/Laboratorio-organizacao-e-arquitetura-de-computadores/Lab5/(base code) risc-v-single-cycle-processor-main/sc_cpu_tb.sv(169)
+#    Time: 1270 ns  Iteration: 1  Instance: /sc_cpu_tb
+# 1
+# Break in Module sc_cpu_tb at D:/Users/csm6/Documents/GitHub/Laboratorio-organizacao-e-arquitetura-de-computadores/Lab5/(base code) risc-v-single-cycle-processor-main/sc_cpu_tb.sv line 169
+# Compile of sc_top.sv was successful.
+# Compile of sc_cpu.sv was successful.
+# Compile of sc_control.sv was successful.
+# Compile of sc_datapath.sv was successful.
+# Compile of sc_imem.sv was successful.
+# Compile of sc_dmem.sv was successful.
+# Compile of sc_regfile.sv was successful.
+# Compile of sc_sign_ext.sv was successful.
+# Compile of sc_alu_ctrl.sv was successful.
+# Compile of sc_alu.sv was successful.
+# Compile of sc_cpu_tb.sv was successful.
+# 11 compiles, 0 failed with no errors.
+run -all
+# ** Error (suppressible): (vsim-PLI-3085) $fdisplay : Argument 1 is an unknown file descriptor.
+#    Time: 1290 ns  Iteration: 1  Process: /sc_cpu_tb/#INITIAL#136 File: D:/Users/csm6/Documents/GitHub/Laboratorio-organizacao-e-arquitetura-de-computadores/Lab5/(base code) risc-v-single-cycle-processor-main/sc_cpu_tb.sv Line: 157
+# TIMEOUT: halt not reached after 60 cycles.
+# ** Note: $finish    : D:/Users/csm6/Documents/GitHub/Laboratorio-organizacao-e-arquitetura-de-computadores/Lab5/(base code) risc-v-single-cycle-processor-main/sc_cpu_tb.sv(169)
+#    Time: 1290 ns  Iteration: 1  Instance: /sc_cpu_tb
+# 1
+# Break in Module sc_cpu_tb at D:/Users/csm6/Documents/GitHub/Laboratorio-organizacao-e-arquitetura-de-computadores/Lab5/(base code) risc-v-single-cycle-processor-main/sc_cpu_tb.sv line 169

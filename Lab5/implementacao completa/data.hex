@@ -1,0 +1,5 @@
+// data.hex — $readmemh format for sc_dmem
+// Corresponds to data.mif
+// Words 002..0FF are not listed; sc_dmem initialises them to 00000000.
+@000 00000005
+@001 00000003

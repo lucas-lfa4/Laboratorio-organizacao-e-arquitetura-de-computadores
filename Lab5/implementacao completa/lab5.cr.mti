@@ -1,0 +1,78 @@
+{D:/Users/csm6/Documents/GitHub/Laboratorio-organizacao-e-arquitetura-de-computadores/Lab5/(base code) risc-v-single-cycle-processor-main/sc_imem.sv} {1 {vlog -work work -sv -stats=none {D:/Users/csm6/Documents/GitHub/Laboratorio-organizacao-e-arquitetura-de-computadores/Lab5/(base code) risc-v-single-cycle-processor-main/sc_imem.sv}
+Model Technology ModelSim - Intel FPGA Edition vlog 2020.1 Compiler 2020.02 Feb 28 2020
+-- Compiling module sc_imem
+
+Top level modules:
+	sc_imem
+
+} {} {}} {D:/Users/csm6/Documents/GitHub/Laboratorio-organizacao-e-arquitetura-de-computadores/Lab5/(base code) risc-v-single-cycle-processor-main/sc_cpu.sv} {1 {vlog -work work -sv -stats=none {D:/Users/csm6/Documents/GitHub/Laboratorio-organizacao-e-arquitetura-de-computadores/Lab5/(base code) risc-v-single-cycle-processor-main/sc_cpu.sv}
+Model Technology ModelSim - Intel FPGA Edition vlog 2020.1 Compiler 2020.02 Feb 28 2020
+-- Compiling module sc_cpu
+
+Top level modules:
+	sc_cpu
+
+} {} {}} {D:/Users/csm6/Documents/GitHub/Laboratorio-organizacao-e-arquitetura-de-computadores/Lab5/(base code) risc-v-single-cycle-processor-main/sc_cpu_tb.sv} {1 {vlog -work work -sv -stats=none {D:/Users/csm6/Documents/GitHub/Laboratorio-organizacao-e-arquitetura-de-computadores/Lab5/(base code) risc-v-single-cycle-processor-main/sc_cpu_tb.sv}
+Model Technology ModelSim - Intel FPGA Edition vlog 2020.1 Compiler 2020.02 Feb 28 2020
+-- Compiling module sc_cpu_tb
+
+Top level modules:
+	sc_cpu_tb
+
+} {} {}} {D:/Users/csm6/Documents/GitHub/Laboratorio-organizacao-e-arquitetura-de-computadores/Lab5/(base code) risc-v-single-cycle-processor-main/sc_sign_ext.sv} {1 {vlog -work work -sv -stats=none {D:/Users/csm6/Documents/GitHub/Laboratorio-organizacao-e-arquitetura-de-computadores/Lab5/(base code) risc-v-single-cycle-processor-main/sc_sign_ext.sv}
+Model Technology ModelSim - Intel FPGA Edition vlog 2020.1 Compiler 2020.02 Feb 28 2020
+-- Compiling module sc_sign_ext
+
+Top level modules:
+	sc_sign_ext
+
+} {} {}} {D:/Users/csm6/Documents/GitHub/Laboratorio-organizacao-e-arquitetura-de-computadores/Lab5/(base code) risc-v-single-cycle-processor-main/sc_control.sv} {1 {vlog -work work -sv -stats=none {D:/Users/csm6/Documents/GitHub/Laboratorio-organizacao-e-arquitetura-de-computadores/Lab5/(base code) risc-v-single-cycle-processor-main/sc_control.sv}
+Model Technology ModelSim - Intel FPGA Edition vlog 2020.1 Compiler 2020.02 Feb 28 2020
+-- Compiling module sc_control
+
+Top level modules:
+	sc_control
+
+} {} {}} {D:/Users/csm6/Documents/GitHub/Laboratorio-organizacao-e-arquitetura-de-computadores/Lab5/(base code) risc-v-single-cycle-processor-main/sc_alu.sv} {1 {vlog -work work -sv -stats=none {D:/Users/csm6/Documents/GitHub/Laboratorio-organizacao-e-arquitetura-de-computadores/Lab5/(base code) risc-v-single-cycle-processor-main/sc_alu.sv}
+Model Technology ModelSim - Intel FPGA Edition vlog 2020.1 Compiler 2020.02 Feb 28 2020
+-- Compiling module sc_alu
+
+Top level modules:
+	sc_alu
+
+} {} {}} {D:/Users/csm6/Documents/GitHub/Laboratorio-organizacao-e-arquitetura-de-computadores/Lab5/(base code) risc-v-single-cycle-processor-main/sc_alu_ctrl.sv} {1 {vlog -work work -sv -stats=none {D:/Users/csm6/Documents/GitHub/Laboratorio-organizacao-e-arquitetura-de-computadores/Lab5/(base code) risc-v-single-cycle-processor-main/sc_alu_ctrl.sv}
+Model Technology ModelSim - Intel FPGA Edition vlog 2020.1 Compiler 2020.02 Feb 28 2020
+-- Compiling module sc_alu_ctrl
+
+Top level modules:
+	sc_alu_ctrl
+
+} {} {}} {D:/Users/csm6/Documents/GitHub/Laboratorio-organizacao-e-arquitetura-de-computadores/Lab5/(base code) risc-v-single-cycle-processor-main/sc_regfile.sv} {1 {vlog -work work -sv -stats=none {D:/Users/csm6/Documents/GitHub/Laboratorio-organizacao-e-arquitetura-de-computadores/Lab5/(base code) risc-v-single-cycle-processor-main/sc_regfile.sv}
+Model Technology ModelSim - Intel FPGA Edition vlog 2020.1 Compiler 2020.02 Feb 28 2020
+-- Compiling module sc_regfile
+
+Top level modules:
+	sc_regfile
+
+} {} {}} {D:/Users/csm6/Documents/GitHub/Laboratorio-organizacao-e-arquitetura-de-computadores/Lab5/(base code) risc-v-single-cycle-processor-main/sc_dmem.sv} {1 {vlog -work work -sv -stats=none {D:/Users/csm6/Documents/GitHub/Laboratorio-organizacao-e-arquitetura-de-computadores/Lab5/(base code) risc-v-single-cycle-processor-main/sc_dmem.sv}
+Model Technology ModelSim - Intel FPGA Edition vlog 2020.1 Compiler 2020.02 Feb 28 2020
+-- Compiling module sc_dmem
+
+Top level modules:
+	sc_dmem
+
+} {} {}} {D:/Users/csm6/Documents/GitHub/Laboratorio-organizacao-e-arquitetura-de-computadores/Lab5/(base code) risc-v-single-cycle-processor-main/sc_datapath.sv} {1 {vlog -work work -sv -stats=none {D:/Users/csm6/Documents/GitHub/Laboratorio-organizacao-e-arquitetura-de-computadores/Lab5/(base code) risc-v-single-cycle-processor-main/sc_datapath.sv}
+Model Technology ModelSim - Intel FPGA Edition vlog 2020.1 Compiler 2020.02 Feb 28 2020
+-- Compiling module sc_datapath
+
+Top level modules:
+	sc_datapath
+
+} {} {}} {D:/Users/csm6/Documents/GitHub/Laboratorio-organizacao-e-arquitetura-de-computadores/Lab5/(base code) risc-v-single-cycle-processor-main/sc_top.sv} {1 {vlog -work work -sv -stats=none {D:/Users/csm6/Documents/GitHub/Laboratorio-organizacao-e-arquitetura-de-computadores/Lab5/(base code) risc-v-single-cycle-processor-main/sc_top.sv}
+Model Technology ModelSim - Intel FPGA Edition vlog 2020.1 Compiler 2020.02 Feb 28 2020
+-- Compiling module sc_top
+
+Top level modules:
+	sc_top
+
+} {} {}}

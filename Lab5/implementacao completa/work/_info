@@ -1,0 +1,286 @@
+m255
+K4
+z2
+!s11f vlog 2020.1 2020.02, Feb 28 2020
+13
+!s112 1.1
+!i10d 8192
+!i10e 25
+!i10f 100
+cModel Technology
+dC:/InstallModelSim
+vsc_alu
+Z0 DXx6 sv_std 3 std 0 22 VYECXdT12H8WgbUP_5Y6:3
+Z1 !s110 1789482251
+!i10b 1
+!s100 Uk803E`ZU>AHHI7@Eeg>51
+Z2 !s11b Dg1SIo80bB@j0V0VzS_@n1
+IACQ7`nfm0[FUK7C?=0X^j2
+Z3 VDg1SIo80bB@j0V0VzS_@n1
+S1
+Z4 dD:/Users/csm6/Documents/GitHub/Laboratorio-organizacao-e-arquitetura-de-computadores/Lab5/(base code) risc-v-single-cycle-processor-main
+Z5 w1789478610
+8D:/Users/csm6/Documents/GitHub/Laboratorio-organizacao-e-arquitetura-de-computadores/Lab5/(base code) risc-v-single-cycle-processor-main/sc_alu.sv
+FD:/Users/csm6/Documents/GitHub/Laboratorio-organizacao-e-arquitetura-de-computadores/Lab5/(base code) risc-v-single-cycle-processor-main/sc_alu.sv
+!i122 85
+L0 18 26
+Z6 OV;L;2020.1;71
+r1
+!s85 0
+31
+Z7 !s108 1789482251.000000
+!s107 D:/Users/csm6/Documents/GitHub/Laboratorio-organizacao-e-arquitetura-de-computadores/Lab5/(base code) risc-v-single-cycle-processor-main/sc_alu.sv|
+!s90 -reportprogress|300|-work|work|-sv|-stats=none|D:/Users/csm6/Documents/GitHub/Laboratorio-organizacao-e-arquitetura-de-computadores/Lab5/(base code) risc-v-single-cycle-processor-main/sc_alu.sv|
+!i113 1
+Z8 o-work work -sv
+Z9 tCvgOpt 0
+vsc_alu_ctrl
+R0
+R1
+!i10b 1
+!s100 PaQWR?iz`JU_K]CU7cGGF1
+R2
+IMYM1]BoWbRD;I4AUXoHZl0
+R3
+S1
+R4
+R5
+8D:/Users/csm6/Documents/GitHub/Laboratorio-organizacao-e-arquitetura-de-computadores/Lab5/(base code) risc-v-single-cycle-processor-main/sc_alu_ctrl.sv
+FD:/Users/csm6/Documents/GitHub/Laboratorio-organizacao-e-arquitetura-de-computadores/Lab5/(base code) risc-v-single-cycle-processor-main/sc_alu_ctrl.sv
+!i122 84
+L0 32 29
+R6
+r1
+!s85 0
+31
+R7
+!s107 D:/Users/csm6/Documents/GitHub/Laboratorio-organizacao-e-arquitetura-de-computadores/Lab5/(base code) risc-v-single-cycle-processor-main/sc_alu_ctrl.sv|
+!s90 -reportprogress|300|-work|work|-sv|-stats=none|D:/Users/csm6/Documents/GitHub/Laboratorio-organizacao-e-arquitetura-de-computadores/Lab5/(base code) risc-v-single-cycle-processor-main/sc_alu_ctrl.sv|
+!i113 1
+R8
+R9
+vsc_control
+R0
+R1
+!i10b 1
+!s100 eb7bgT1:A4hEoS168WAbP1
+R2
+IgiDbkzbKc7==5XG7]iVTM1
+R3
+S1
+R4
+w1789480803
+8D:/Users/csm6/Documents/GitHub/Laboratorio-organizacao-e-arquitetura-de-computadores/Lab5/(base code) risc-v-single-cycle-processor-main/sc_control.sv
+FD:/Users/csm6/Documents/GitHub/Laboratorio-organizacao-e-arquitetura-de-computadores/Lab5/(base code) risc-v-single-cycle-processor-main/sc_control.sv
+!i122 78
+L0 39 58
+R6
+r1
+!s85 0
+31
+R7
+!s107 D:/Users/csm6/Documents/GitHub/Laboratorio-organizacao-e-arquitetura-de-computadores/Lab5/(base code) risc-v-single-cycle-processor-main/sc_control.sv|
+!s90 -reportprogress|300|-work|work|-sv|-stats=none|D:/Users/csm6/Documents/GitHub/Laboratorio-organizacao-e-arquitetura-de-computadores/Lab5/(base code) risc-v-single-cycle-processor-main/sc_control.sv|
+!i113 1
+R8
+R9
+vsc_cpu
+R0
+R1
+!i10b 1
+!s100 I[@1Bgm;KZO]l6hAZIcm?2
+R2
+IfYQhXCc<LXUbUjHjmGR[73
+R3
+S1
+R4
+R5
+8D:/Users/csm6/Documents/GitHub/Laboratorio-organizacao-e-arquitetura-de-computadores/Lab5/(base code) risc-v-single-cycle-processor-main/sc_cpu.sv
+FD:/Users/csm6/Documents/GitHub/Laboratorio-organizacao-e-arquitetura-de-computadores/Lab5/(base code) risc-v-single-cycle-processor-main/sc_cpu.sv
+!i122 77
+L0 17 52
+R6
+r1
+!s85 0
+31
+Z10 !s108 1789482250.000000
+!s107 D:/Users/csm6/Documents/GitHub/Laboratorio-organizacao-e-arquitetura-de-computadores/Lab5/(base code) risc-v-single-cycle-processor-main/sc_cpu.sv|
+!s90 -reportprogress|300|-work|work|-sv|-stats=none|D:/Users/csm6/Documents/GitHub/Laboratorio-organizacao-e-arquitetura-de-computadores/Lab5/(base code) risc-v-single-cycle-processor-main/sc_cpu.sv|
+!i113 1
+R8
+R9
+vsc_cpu_tb
+R0
+!s110 1789482252
+!i10b 1
+!s100 Jz:m]zb:VB25XJb6iMz3h2
+R2
+Im:Kc`]a:eA@V<8Q7_6TQb3
+R3
+S1
+R4
+R5
+8D:/Users/csm6/Documents/GitHub/Laboratorio-organizacao-e-arquitetura-de-computadores/Lab5/(base code) risc-v-single-cycle-processor-main/sc_cpu_tb.sv
+FD:/Users/csm6/Documents/GitHub/Laboratorio-organizacao-e-arquitetura-de-computadores/Lab5/(base code) risc-v-single-cycle-processor-main/sc_cpu_tb.sv
+!i122 86
+L0 47 210
+R6
+r1
+!s85 0
+31
+R7
+!s107 D:/Users/csm6/Documents/GitHub/Laboratorio-organizacao-e-arquitetura-de-computadores/Lab5/(base code) risc-v-single-cycle-processor-main/sc_cpu_tb.sv|
+!s90 -reportprogress|300|-work|work|-sv|-stats=none|D:/Users/csm6/Documents/GitHub/Laboratorio-organizacao-e-arquitetura-de-computadores/Lab5/(base code) risc-v-single-cycle-processor-main/sc_cpu_tb.sv|
+!i113 1
+R8
+R9
+vsc_datapath
+R0
+R1
+!i10b 1
+!s100 5D<zOoSI12M^7=PCNoc_H2
+R2
+IlTn]AMX?kISDV412eTQ6F1
+R3
+S1
+R4
+R5
+8D:/Users/csm6/Documents/GitHub/Laboratorio-organizacao-e-arquitetura-de-computadores/Lab5/(base code) risc-v-single-cycle-processor-main/sc_datapath.sv
+FD:/Users/csm6/Documents/GitHub/Laboratorio-organizacao-e-arquitetura-de-computadores/Lab5/(base code) risc-v-single-cycle-processor-main/sc_datapath.sv
+!i122 79
+L0 28 155
+R6
+r1
+!s85 0
+31
+R7
+!s107 D:/Users/csm6/Documents/GitHub/Laboratorio-organizacao-e-arquitetura-de-computadores/Lab5/(base code) risc-v-single-cycle-processor-main/sc_datapath.sv|
+!s90 -reportprogress|300|-work|work|-sv|-stats=none|D:/Users/csm6/Documents/GitHub/Laboratorio-organizacao-e-arquitetura-de-computadores/Lab5/(base code) risc-v-single-cycle-processor-main/sc_datapath.sv|
+!i113 1
+R8
+R9
+vsc_dmem
+R0
+R1
+!i10b 1
+!s100 fU]`oonEimcKAnVZZEMOO0
+R2
+ICI7mk0592k`7DiEfIOm>02
+R3
+S1
+R4
+R5
+8D:/Users/csm6/Documents/GitHub/Laboratorio-organizacao-e-arquitetura-de-computadores/Lab5/(base code) risc-v-single-cycle-processor-main/sc_dmem.sv
+FD:/Users/csm6/Documents/GitHub/Laboratorio-organizacao-e-arquitetura-de-computadores/Lab5/(base code) risc-v-single-cycle-processor-main/sc_dmem.sv
+!i122 81
+L0 25 21
+R6
+r1
+!s85 0
+31
+R7
+!s107 D:/Users/csm6/Documents/GitHub/Laboratorio-organizacao-e-arquitetura-de-computadores/Lab5/(base code) risc-v-single-cycle-processor-main/sc_dmem.sv|
+!s90 -reportprogress|300|-work|work|-sv|-stats=none|D:/Users/csm6/Documents/GitHub/Laboratorio-organizacao-e-arquitetura-de-computadores/Lab5/(base code) risc-v-single-cycle-processor-main/sc_dmem.sv|
+!i113 1
+R8
+R9
+vsc_imem
+R0
+R1
+!i10b 1
+!s100 :9VLLVR@70EBi5QaQl;Q[0
+R2
+IHf^NCH[YHX20?5Ji3KUH;0
+R3
+S1
+R4
+R5
+8D:/Users/csm6/Documents/GitHub/Laboratorio-organizacao-e-arquitetura-de-computadores/Lab5/(base code) risc-v-single-cycle-processor-main/sc_imem.sv
+FD:/Users/csm6/Documents/GitHub/Laboratorio-organizacao-e-arquitetura-de-computadores/Lab5/(base code) risc-v-single-cycle-processor-main/sc_imem.sv
+!i122 80
+L0 28 15
+R6
+r1
+!s85 0
+31
+R7
+!s107 D:/Users/csm6/Documents/GitHub/Laboratorio-organizacao-e-arquitetura-de-computadores/Lab5/(base code) risc-v-single-cycle-processor-main/sc_imem.sv|
+!s90 -reportprogress|300|-work|work|-sv|-stats=none|D:/Users/csm6/Documents/GitHub/Laboratorio-organizacao-e-arquitetura-de-computadores/Lab5/(base code) risc-v-single-cycle-processor-main/sc_imem.sv|
+!i113 1
+R8
+R9
+vsc_regfile
+R0
+R1
+!i10b 1
+!s100 J>:ci;E4b27QelOzBK8P^3
+R2
+ID>2f1]1AChG;PEjdVL9PH3
+R3
+S1
+R4
+R5
+8D:/Users/csm6/Documents/GitHub/Laboratorio-organizacao-e-arquitetura-de-computadores/Lab5/(base code) risc-v-single-cycle-processor-main/sc_regfile.sv
+FD:/Users/csm6/Documents/GitHub/Laboratorio-organizacao-e-arquitetura-de-computadores/Lab5/(base code) risc-v-single-cycle-processor-main/sc_regfile.sv
+!i122 82
+L0 15 41
+R6
+r1
+!s85 0
+31
+R7
+!s107 D:/Users/csm6/Documents/GitHub/Laboratorio-organizacao-e-arquitetura-de-computadores/Lab5/(base code) risc-v-single-cycle-processor-main/sc_regfile.sv|
+!s90 -reportprogress|300|-work|work|-sv|-stats=none|D:/Users/csm6/Documents/GitHub/Laboratorio-organizacao-e-arquitetura-de-computadores/Lab5/(base code) risc-v-single-cycle-processor-main/sc_regfile.sv|
+!i113 1
+R8
+R9
+vsc_sign_ext
+R0
+R1
+!i10b 1
+!s100 QCJ@z=8;ZkeI2^SCzSbA_1
+R2
+Ig8ISD:kd3VzS5`Ac1M:]A2
+R3
+S1
+R4
+R5
+8D:/Users/csm6/Documents/GitHub/Laboratorio-organizacao-e-arquitetura-de-computadores/Lab5/(base code) risc-v-single-cycle-processor-main/sc_sign_ext.sv
+FD:/Users/csm6/Documents/GitHub/Laboratorio-organizacao-e-arquitetura-de-computadores/Lab5/(base code) risc-v-single-cycle-processor-main/sc_sign_ext.sv
+!i122 83
+L0 30 27
+R6
+r1
+!s85 0
+31
+R7
+!s107 D:/Users/csm6/Documents/GitHub/Laboratorio-organizacao-e-arquitetura-de-computadores/Lab5/(base code) risc-v-single-cycle-processor-main/sc_sign_ext.sv|
+!s90 -reportprogress|300|-work|work|-sv|-stats=none|D:/Users/csm6/Documents/GitHub/Laboratorio-organizacao-e-arquitetura-de-computadores/Lab5/(base code) risc-v-single-cycle-processor-main/sc_sign_ext.sv|
+!i113 1
+R8
+R9
+vsc_top
+R0
+!s110 1789482250
+!i10b 1
+!s100 koOi]7k>0;H_nPRKDfg:42
+R2
+I3WjMdS[CNZcPE?fYAJI841
+R3
+S1
+R4
+R5
+8D:/Users/csm6/Documents/GitHub/Laboratorio-organizacao-e-arquitetura-de-computadores/Lab5/(base code) risc-v-single-cycle-processor-main/sc_top.sv
+FD:/Users/csm6/Documents/GitHub/Laboratorio-organizacao-e-arquitetura-de-computadores/Lab5/(base code) risc-v-single-cycle-processor-main/sc_top.sv
+!i122 76
+L0 21 13
+R6
+r1
+!s85 0
+31
+R10
+!s107 D:/Users/csm6/Documents/GitHub/Laboratorio-organizacao-e-arquitetura-de-computadores/Lab5/(base code) risc-v-single-cycle-processor-main/sc_top.sv|
+!s90 -reportprogress|300|-work|work|-sv|-stats=none|D:/Users/csm6/Documents/GitHub/Laboratorio-organizacao-e-arquitetura-de-computadores/Lab5/(base code) risc-v-single-cycle-processor-main/sc_top.sv|
+!i113 1
+R8
+R9

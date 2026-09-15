@@ -1,0 +1,83 @@
+-- =============================================================================
+-- program.mif
+-- Instruction test for single-cycle RISC-V (without LCD/MMIO)
+--
+-- Exercises every supported instruction:
+--   lw, sw  (I-type / S-type)
+--   add, sub, and, or, slt  (R-type)
+--   beq not-taken, beq taken  (B-type)
+--
+-- Register usage:
+--   x1 = 5  (A, loaded from mem[0])
+--   x2 = 3  (B, loaded from mem[4])
+--   x3 = A + B = 8
+--   x4 = A - B = 2
+--   x5 = A AND B = 1  (101 AND 011 = 001)
+--   x6 = A OR  B = 7  (101 OR  011 = 111)
+--   x7 = (x2 < x1) = 1   slt: 3 < 5 = true
+--   x8 = (x1 < x2) = 0   slt: 5 < 3 = false
+--   x9 = mem[8] after sw  = 8  (loaded back to verify sw/lw roundtrip)
+--   x10 = 0 if beq TAKEN (skipped), or 16 (0x10) if beq wrongly NOT taken
+--
+-- Memory layout (data.mif):
+--   byte  0 (word 00) : A = 5      [input]
+--   byte  4 (word 01) : B = 3      [input]
+--   byte  8 (word 02) : A+B = 8    [written by sw at word 08]
+--   byte 12 (word 03) : A-B = 2    [written by sw at word 09]
+--   byte 16 (word 04) : A AND B= 1 [written by sw at word 0A]
+--   byte 20 (word 05) : A OR  B= 7 [written by sw at word 0B]
+--   byte 24 (word 06) : slt(3<5)=1 [written by sw at word 0C]
+--   byte 28 (word 07) : slt(5<3)=0 [written by sw at word 0D]
+--
+-- Instruction encoding (RV32I manual):
+--   R-type : funct7[31:25] | rs2[24:20] | rs1[19:15] | funct3[14:12] | rd[11:7] | opcode[6:0]
+--   I-type : imm[31:20]    | rs1[19:15] | funct3[14:12] | rd[11:7]   | opcode[6:0]
+--   S-type : imm[11:5][31:25] | rs2[24:20] | rs1[19:15] | funct3[14:12] | imm[4:0][11:7] | opcode[6:0]
+--   B-type : imm[12|10:5][31:25] | rs2[24:20] | rs1[19:15] | funct3[14:12] | imm[4:1|11][11:7] | opcode[6:0]
+-- =============================================================================
+
+DEPTH = 256;
+WIDTH = 32;
+ADDRESS_RADIX = HEX;
+DATA_RADIX = HEX;
+
+CONTENT
+BEGIN
+
+-- ---- Load operands from data memory (lw) ------------------------------------
+000 : 00002083;  -- lw x1,  0(x0)    x1 = mem[0]  = 5   (A)
+001 : 00402103;  -- lw x2,  4(x0)    x2 = mem[4]  = 3   (B)
+
+-- ---- R-type: add, sub, and, or, slt -----------------------------------------
+002 : 002081B3;  -- add x3, x1, x2   x3 = 5+3 = 8
+003 : 40208233;  -- sub x4, x1, x2   x4 = 5-3 = 2
+004 : 0020F2B3;  -- and x5, x1, x2   x5 = 101 AND 011 = 001 = 1
+005 : 0020E333;  -- or  x6, x1, x2   x6 = 101 OR  011 = 111 = 7
+006 : 001123B3;  -- slt x7, x2, x1   x7 = (3 < 5) = 1      (true)
+007 : 0020A433;  -- slt x8, x1, x2   x8 = (5 < 3) = 0      (false)
+
+-- ---- Store results to data memory (sw) --------------------------------------
+008 : 00302423;  -- sw x3,  8(x0)    mem[8]  = 8
+009 : 00402623;  -- sw x4, 12(x0)    mem[12] = 2
+00A : 00502823;  -- sw x5, 16(x0)    mem[16] = 1
+00B : 00602A23;  -- sw x6, 20(x0)    mem[20] = 7
+00C : 00702C23;  -- sw x7, 24(x0)    mem[24] = 1
+00D : 00802E23;  -- sw x8, 28(x0)    mem[28] = 0
+
+-- ---- beq NOT taken: x1(=5) != x2(=3), falls through to word 00F ------------
+00E : 00208463;  -- beq x1, x2, +8   NOT taken -> PC = word 00F
+
+-- ---- lw: load back a stored value to verify sw/lw roundtrip -----------------
+00F : 00802483;  -- lw x9, 8(x0)     x9 = mem[8] = 8  (== x3)
+
+-- ---- beq TAKEN: x3(=8) == x9(=8), skips word 011 ---------------------------
+010 : 00918463;  -- beq x3, x9, +8   TAKEN -> PC = word 012 (skips 011)
+011 : 00318533;  -- add x10, x3, x3  SKIPPED (x10 = x3+x3 = 16 if wrongly executed)
+
+-- ---- Halt: infinite self-loop -----------------------------------------------
+012 : 00000063;  -- beq x0, x0, 0    halt
+
+-- ---- Remainder: NOPs --------------------------------------------------------
+[013..0FF] : 00000013;  -- nop (addi x0, x0, 0)
+
+END;

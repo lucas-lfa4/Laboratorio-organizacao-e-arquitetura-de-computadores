@@ -1,0 +1,33 @@
+-- =============================================================================
+-- data.mif
+-- Data Memory initialization - single-cycle RISC-V test program
+--
+-- Word address = byte_address / 4  (sc_dmem uses alu_result[9:2])
+--
+-- Initial values read by program.mif:
+--   word 000 (byte  0) : A = 5   -> lw x1, 0(x0)
+--   word 001 (byte  4) : B = 3   -> lw x2, 4(x0)
+--
+-- Values written at runtime by the program (sw instructions):
+--   word 002 (byte  8) : A+B = 8
+--   word 003 (byte 12) : A-B = 2
+--   word 004 (byte 16) : A AND B = 1
+--   word 005 (byte 20) : A OR  B = 7
+--   word 006 (byte 24) : slt(B<A) = 1
+--   word 007 (byte 28) : slt(A<B) = 0
+-- =============================================================================
+
+DEPTH = 256;
+WIDTH = 32;
+ADDRESS_RADIX = HEX;
+DATA_RADIX = HEX;
+
+CONTENT
+BEGIN
+
+000 : 00000005;  -- A = 5
+001 : 00000003;  -- B = 3
+
+[002..0FF] : 00000000;
+
+END;

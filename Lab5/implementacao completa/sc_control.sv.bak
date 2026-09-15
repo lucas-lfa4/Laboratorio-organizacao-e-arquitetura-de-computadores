@@ -67,29 +67,29 @@ module sc_control (
         case (Opcode)
             R_TYPE: begin
                 RegWrite = 1'b1;
-                ALUOp = 2'b10;
+                ALUOp    = 2'b10;
             end
 
             LOAD: begin
-                ALUSrc = 1'b1;
+                ALUSrc   = 1'b1;
                 MemtoReg = 1'b1;
                 RegWrite = 1'b1;
-                MemRead = 1'b1;
-                ALUOp = 2'b00;
+                MemRead  = 1'b1;
+                ALUOp    = 2'b00;
             end
 
             STORE: begin
-                ALUSrc = 1'b1;
+                ALUSrc   = 1 me1;
                 MemWrite = 1'b1;
-                ALUOp = 2'b00;
+                ALUOp    = 2'b00;
             end
 
             BRANCH: begin
-                Branch = 1'b1;
-                ALUOp = 2'b01;
+                Branch   = 1'b1;
+                ALUOp    = 2'b01;
             end
 
-            default: ; // signals remain at safe defaults
+            default: ; // permanece nos valores padrão seguros
         endcase
     end
 

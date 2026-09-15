@@ -1,0 +1,8 @@
+.claude/
+quartus/*
+!quartus/sc_top.sdc
+modelsim/*
+!modelsim/golden.txt
+!modelsim/data.hex
+!modelsim/program.hex
+sc_control_answer.sv
