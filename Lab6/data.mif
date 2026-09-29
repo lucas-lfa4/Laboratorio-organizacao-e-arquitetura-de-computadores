@@ -1,0 +1,31 @@
+-- =============================================================================
+-- data.mif
+-- Data Memory initialization - MMIO test program
+--
+-- Word address = byte_address / 4  (sc_dmem uses alu_result[9:2])
+--
+-- Initial values read by program.mif:
+--   word 000 (byte  0) : 0x00000400 = MMIO base address
+--   word 001 (byte  4) : 0x0003FFFF = all 18 LEDR bits set
+--   word 002 (byte  8) : 0x000001FF = all  9 LEDG bits set
+--
+-- Values written at runtime by the program (sw instructions):
+--   word 003 (byte 12) : SW[17:0]  value  -> sw x4, 12(x0)
+--   word 004 (byte 16) : KEY[3:0]  value  -> sw x5, 16(x0)
+-- =============================================================================
+
+DEPTH = 256;
+WIDTH = 32;
+ADDRESS_RADIX = HEX;
+DATA_RADIX = HEX;
+
+CONTENT
+BEGIN
+
+000 : 00000400;  -- MMIO base address
+001 : 0003FFFF;  -- all 18 LEDR bits set (written to LEDR register)
+002 : 000001FF;  -- all  9 LEDG bits set (written to LEDG register)
+
+[003..0FF] : 00000000;
+
+END;
