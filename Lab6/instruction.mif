@@ -1,0 +1,12 @@
+DEPTH = 256;            -- The size of memory in words
+WIDTH = 32;             -- The size of data in bits
+ADDRESS_RADIX = HEX;    -- The radix for address values
+DATA_RADIX = HEX;       -- The radix for data values
+CONTENT                 -- Start of (address: data pairs)
+BEGIN
+
+000 : 00002083;  -- lw x1,0(x0)   // x1 = data[0] = 0x00000400 (MMIO base)
+001 : 0000A103;  -- lw x2,0(x1)   // x2 = SW[17:0]    (addr 0x400)
+002 : 0020A423;  -- sw x2,8(x1)   // LEDR <= 0x3FFFF  (addr 0x400+8 = 0x408)
+003 : FE000CE3;  -- beq x0,x0,-8
+END;
