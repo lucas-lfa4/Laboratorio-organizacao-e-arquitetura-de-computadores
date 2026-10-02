@@ -14,15 +14,15 @@ beq x10,x0,8     // ja estava pressionado -> nao e borda nova, pula
 add x4,x4,x5     // borda nova (solto->pressionado) -> incrementa
 and x9,x2,x7     // x9 = KEY2 agora (0 = pressionado)
 beq x9,x0,8	 // pressionado agora? -> checar estado anterior
-beq x0,x0,16	 
+beq x0,x0,16	 // pula 4 linhas
 and x10,x3,x7    // x10 = KEY2 antes
 beq x10,x0,8	 // KEY2 estava pressionado antes esta pressionado? se sim, pule 2 linhas
 sub x4,x4,x5     // borda nova -> decrementa
 and x9,x2,x8     // x9 = KEY1 agora
-beq x9,x0,8
-beq x0,x0,16
+beq x9,x0,8	 // pressionado agora? -> checar estado anterior
+beq x0,x0,16	 // pula 4 linhas
 and x10,x3,x8    // x10 = KEY1 antes
-beq x10,x0,8
+beq x10,x0,8	 // pula 2 linhas
 sub x4,x4,x4     // borda nova -> zera contador
 sw x4,12(x1)     // LEDG <= contador[8:0]  (0x400+12 = 0x40C)
 add x3,x2,x0     // prev = now (guarda leitura atual p/ proxima volta)
