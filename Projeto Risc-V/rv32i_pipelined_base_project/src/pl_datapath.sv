@@ -30,6 +30,7 @@ module pl_datapath (
 
     // Sinais de controle vindos do estagio ID (pl_control)
     input  logic        ALUSrc,
+    input  logic [1:0]  ALUSrcA,      // 00=rs1, 01=PC (AUIPC), 10=zero (LUI)
     input  logic        MemtoReg,
     input  logic        RegWrite,
     input  logic        MemRead,
@@ -88,7 +89,7 @@ module pl_datapath (
 
     // EX -- forwarding
     logic [1:0]  fwd_a, fwd_b;
-    logic [31:0] fwd_srca, fwd_srcb, alu_srcb;
+    logic [31:0] fwd_srca, fwd_srcb, alu_srca, alu_srcb;
     logic [31:0] alu_result;
     logic        zero;
 
@@ -180,6 +181,7 @@ module pl_datapath (
     always_ff @(posedge clk or negedge rst_n) begin
         if (!rst_n) begin                      // reset assicrono (unico sinal na lista)
             id_ex.alu_src    <= 1'b0;
+            id_ex.alu_src_a  <= 2'b00;
             id_ex.mem_to_reg <= 1'b0;
             id_ex.reg_write  <= 1'b0;
             id_ex.mem_read   <= 1'b0;
@@ -197,6 +199,7 @@ module pl_datapath (
             id_ex.funct7     <= 7'b0;
         end else if (stall || pc_src) begin    // NOP sincrono: load-use ou branch
             id_ex.alu_src    <= 1'b0;
+            id_ex.alu_src_a  <= 2'b00;
             id_ex.mem_to_reg <= 1'b0;
             id_ex.reg_write  <= 1'b0;
             id_ex.mem_read   <= 1'b0;
@@ -214,6 +217,7 @@ module pl_datapath (
             id_ex.funct7     <= 7'b0;
         end else begin
             id_ex.alu_src    <= ALUSrc;
+            id_ex.alu_src_a  <= ALUSrcA;
             id_ex.mem_to_reg <= MemtoReg;
             id_ex.reg_write  <= RegWrite;
             id_ex.mem_read   <= MemRead;
@@ -269,11 +273,22 @@ module pl_datapath (
         endcase
     end
 
+    // Mux ALUSrcA: rs1 (ja com forwarding), PC ou zero
+    //   Fica DEPOIS do forwarding: em LUI/AUIPC os bits [19:15] sao parte do
+    //   imediato, e o valor que o forwarding encaminhar e simplesmente descartado.
+    always_comb begin
+        case (id_ex.alu_src_a)
+            2'b01:   alu_srca = id_ex.pc;    // AUIPC: PC + imm
+            2'b10:   alu_srca = 32'b0;       // LUI:   0  + imm
+            default: alu_srca = fwd_srca;    // demais instrucoes: rs1
+        endcase
+    end
+
     // Mux ALUSrc: imediato ou registrador
     assign alu_srcb = id_ex.alu_src ? id_ex.imm_ext : fwd_srcb;
 
     pl_alu alu (
-        .SrcA      (fwd_srca),
+        .SrcA      (alu_srca),
         .SrcB      (alu_srcb),
         .Operation (ALU_CC),
         .ALUResult (alu_result),

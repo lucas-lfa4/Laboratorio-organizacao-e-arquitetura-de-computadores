@@ -1,0 +1,25 @@
+-- ============================================================
+-- data.mif — gerado por: python assembler.py --dump
+--
+-- 0x000..0x01F : area do usuario  (byte 0x000..0x07C)
+-- 0x078..0x07F : saves x1-x8   (byte 0x1E0..0x1FC, escritos em runtime)
+-- 0x080..0x086 : constantes de infraestrutura (byte 0x200..)
+-- ============================================================
+DEPTH = 256;
+WIDTH = 32;
+ADDRESS_RADIX = HEX;
+DATA_RADIX = HEX;
+CONTENT
+BEGIN
+
+[000..0FF] : 00000000;  -- zeros por padrao
+
+080 : 00000410;  -- UART TX/status addr      -> x15
+081 : 00000200;  -- tx_busy mask (bit 9)     -> x17
+082 : 00000004;  -- step = 4                 -> x18
+083 : 00000400;  -- MMIO base 0x400          -> x20
+084 : 000001FF;  -- LEDG all-on 0x1FF        -> x21
+085 : 000001E0;  -- saves start byte 0x1E0 -> x23
+086 : 00000200;  -- saves end   byte 0x200 -> x24
+
+END;

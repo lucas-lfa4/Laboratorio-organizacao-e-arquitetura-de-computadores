@@ -1,0 +1,17 @@
+addi x1,x0,5
+addi x2,x0,-3
+andi x3,x1,6
+ori x4,x1,8
+slti x5,x2,1
+slti x6,x1,-1
+slli x7,x1,3
+srli x8,x2,28
+srai x9,x2,1
+lui x10,74565
+addi x10,x10,1656
+auipc x11,0
+auipc x12,1
+sw x10,8(x0)
+lw x13,8(x0)
+addi x13,x13,1
+beq x0,x0,0
