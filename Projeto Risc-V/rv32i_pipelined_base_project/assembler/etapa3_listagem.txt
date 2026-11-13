@@ -1,0 +1,78 @@
+Etapa 03 -- programa de teste (assembler/etapa3.asm)
+Endereco  Codigo    Instrucao             Efeito esperado
+------------------------------------------------------------------------------------------
+0x000     00000413  addi x8,x0,0          x8 = 0  (mascara de testes de branch)
+0x004     00000493  addi x9,x0,0          x9 = 0  (contador de erros)
+0x008     123480B7  lui x1,74568          x1 = 0x12348000
+0x00C     76508093  addi x1,x1,1893       x1 = 0x12348765
+0x010     00102823  sw x1,16(x0)          M[0x10] = 0x12348765
+0x014     01100103  lb x2,17(x0)          x2 = 0xFFFFFF87  LB  (byte 0x87, sinal)
+0x018     01104183  lbu x3,17(x0)         x3 = 0x00000087  LBU (byte 0x87, zeros)
+0x01C     01001203  lh x4,16(x0)          x4 = 0xFFFF8765  LH  (half 0x8765, sinal)
+0x020     01005283  lhu x5,16(x0)         x5 = 0x00008765  LHU (half 0x8765, zeros)
+0x024     01300303  lb x6,19(x0)          x6 = 0x00000012  LB positivo
+0x028     01201383  lh x7,18(x0)          x7 = 0x00001234  LH na metade de cima
+0x02C     00638833  add x16,x7,x6         x16 = 0x1246  (load-use logo apos LH)
+0x030     00100A23  sb x1,20(x0)          M[0x14] = 0x00000065  SB byte 0
+0x034     00100BA3  sb x1,23(x0)          M[0x14] = 0x65000065  SB byte 3
+0x038     00101D23  sh x1,26(x0)          M[0x18] = 0x87650000  SH metade de cima
+0x03C     00101C23  sh x1,24(x0)          M[0x18] = 0x87658765  SH metade de baixo
+0x040     000008A3  sb x0,17(x0)          M[0x10] = 0x12340065  SB zera so o byte 1
+0x044     01402883  lw x17,20(x0)         x17 = 0x65000065
+0x048     01002903  lw x18,16(x0)         x18 = 0x12340065
+0x04C     00310463  beq x2,x3,8           nao toma
+0x050     00146413  ori x8,x8,1           bit 0
+0x054     00311463  bne x2,x3,8           toma
+0x058     00148493  addi x9,x9,1          ERRO se executar
+0x05C     00246413  ori x8,x8,2           bit 1
+0x060     00319463  bne x3,x3,8           nao toma
+0x064     00446413  ori x8,x8,4           bit 2
+0x068     00314463  blt x2,x3,8           toma  (-121 < 135 com sinal)
+0x06C     00148493  addi x9,x9,1          ERRO se executar
+0x070     00846413  ori x8,x8,8           bit 3
+0x074     0021C463  blt x3,x2,8           nao toma
+0x078     01046413  ori x8,x8,16          bit 4
+0x07C     0021D463  bge x3,x2,8           toma
+0x080     00148493  addi x9,x9,1          ERRO se executar
+0x084     02046413  ori x8,x8,32          bit 5
+0x088     00315463  bge x2,x3,8           nao toma
+0x08C     04046413  ori x8,x8,64          bit 6
+0x090     0021E463  bltu x3,x2,8          toma  (0x87 < 0xFFFFFF87 sem sinal)
+0x094     00148493  addi x9,x9,1          ERRO se executar
+0x098     08046413  ori x8,x8,128         bit 7
+0x09C     00316463  bltu x2,x3,8          nao toma
+0x0A0     10046413  ori x8,x8,256         bit 8
+0x0A4     00317463  bgeu x2,x3,8          toma
+0x0A8     00148493  addi x9,x9,1          ERRO se executar
+0x0AC     20046413  ori x8,x8,512         bit 9
+0x0B0     0021F463  bgeu x3,x2,8          nao toma
+0x0B4     40046413  ori x8,x8,1024        bit 10  -> x8 final = 0x7FF
+0x0B8     0080056F  jal x10,8             x10 = PC+4, pula a proxima
+0x0BC     00148493  addi x9,x9,1          ERRO se executar
+0x0C0     00000597  auipc x11,0           x11 = PC desta instrucao
+0x0C4     01158667  jalr x12,x11,17       PC = (x11+17)&~1 = x11+16 ; x12 = PC+4
+0x0C8     00148493  addi x9,x9,1          ERRO se executar
+0x0CC     00148493  addi x9,x9,1          ERRO se executar
+0x0D0     00C006EF  jal x13,12            chama FUNC ; x13 = endereco de retorno
+0x0D4     00170793  addi x15,x14,1        RET: x15 = x14 + 1 = 8
+0x0D8     00C0006F  jal x0,12             pula por cima da FUNC
+0x0DC     00700713  addi x14,x0,7         FUNC: x14 = 7
+0x0E0     00068067  jalr x0,x13,0         retorna para RET
+0x0E4     02802023  sw x8,32(x0)          M[0x20] = 0x000007FF  mascara dos branches
+0x0E8     02902223  sw x9,36(x0)          M[0x24] = 0x00000000  erros
+0x0EC     02A02423  sw x10,40(x0)         M[0x28] = link do JAL
+0x0F0     02C02623  sw x12,44(x0)         M[0x2C] = link do JALR
+0x0F4     02F02823  sw x15,48(x0)         M[0x30] = 0x00000008  chamada/retorno
+0x0F8     00000063  beq x0,x0,0           halt (so na versao de simulacao)
+
+Estado final esperado (simulacao, com o data.hex do projeto):
+  x1=0x12348765 x2=0xFFFFFF87 x3=0x00000087 x4=0xFFFF8765 x5=0x00008765
+  x6=0x00000012 x7=0x00001234 x8=0x000007FF x9=0x00000000 x10=0x000000BC
+  x11=0x000000C0 x12=0x000000C8 x13=0x000000D4 x14=0x00000007 x15=0x00000008
+  x16=0x00001246 x17=0x65000065 x18=0x12340065
+  M[0x00]=0x0000000A M[0x04]=0x00000014 (vem do data.hex)
+  M[0x10]=0x12340065 M[0x14]=0x65000065 M[0x18]=0x87658765
+  M[0x20]=0x000007FF M[0x24]=0x00000000 M[0x28]=0x000000BC M[0x2C]=0x000000C8 M[0x30]=0x00000008
+
+Na placa (etapa3_fpga.asm + --dump) os valores sao os mesmos para x1-x8 e para a
+memoria, exceto M[0x00] e M[0x04], que ficam 0 (o data.mif do --dump nao tem o 10 e o 20).

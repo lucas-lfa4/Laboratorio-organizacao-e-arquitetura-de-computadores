@@ -1,11 +1,37 @@
-quartus/*
-!quartus/pl_top.sdc
-!quartus/pl_top_no_pll.sdc
-!quartus/add_to_qsf.txt
-modelsim/*
-!modelsim/golden.txt
-!modelsim/data.hex
-!modelsim/program.hex
-assembler/*
-!assembler/assembler.py
-!assembler/hello.asm
+# =============================================================================
+# .gitignore -- rv32i_pipelined_base_project
+#
+# Regra geral: versionar tudo o que a equipe escreve (codigo, testes, .mif,
+# projeto do Quartus, goldens) e ignorar so o que as ferramentas geram
+# sozinhas a cada compilacao/simulacao.
+# =============================================================================
+
+# ---- Quartus: gerados na compilacao -----------------------------------------
+quartus/db/
+quartus/incremental_db/
+quartus/output_files/
+quartus/simulation/
+quartus/greybox_tmp/
+quartus/*.qws
+quartus/*.qdf
+quartus/*.bak
+quartus/*.qarlog
+quartus/c5_pin_model_dump.txt
+
+# ---- ModelSim: gerados na simulacao -----------------------------------------
+modelsim/work/
+modelsim/output.txt
+modelsim/transcript
+modelsim/*.wlf
+modelsim/*.vstf
+transcript
+*.wlf
+
+# ---- Montador: saidas geradas (os .asm sao versionados) ---------------------
+assembler/program.hex
+assembler/instruction.mif
+assembler/data.mif
+
+# ---- Python -----------------------------------------------------------------
+__pycache__/
+*.pyc

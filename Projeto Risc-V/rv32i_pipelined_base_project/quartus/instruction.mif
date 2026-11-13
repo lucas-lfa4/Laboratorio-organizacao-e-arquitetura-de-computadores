@@ -1,0 +1,129 @@
+-- ============================================================
+-- instruction.mif — gerado por: python assembler.py --dump
+--
+-- 0x000..0x03D : codigo do usuario (62 instrucao(oes))
+-- 0x03E       : beq x0,x0 -> 0x80  (desvio para dump)
+-- 0x03F..0x07F : NOP (addi x0,x0,0)
+-- 0x080..0x0AD : dump serial (Parts 2-8)
+-- ============================================================
+DEPTH = 256;
+WIDTH = 32;
+ADDRESS_RADIX = HEX;
+DATA_RADIX = HEX;
+CONTENT
+BEGIN
+
+000 : 00000413;  -- addi x8,x0,0
+001 : 00000493;  -- addi x9,x0,0
+002 : 123480B7;  -- lui x1,74568
+003 : 76508093;  -- addi x1,x1,1893
+004 : 00102823;  -- sw x1,16(x0)
+005 : 01100103;  -- lb x2,17(x0)
+006 : 01104183;  -- lbu x3,17(x0)
+007 : 01001203;  -- lh x4,16(x0)
+008 : 01005283;  -- lhu x5,16(x0)
+009 : 01300303;  -- lb x6,19(x0)
+00A : 01201383;  -- lh x7,18(x0)
+00B : 00638833;  -- add x16,x7,x6
+00C : 00100A23;  -- sb x1,20(x0)
+00D : 00100BA3;  -- sb x1,23(x0)
+00E : 00101D23;  -- sh x1,26(x0)
+00F : 00101C23;  -- sh x1,24(x0)
+010 : 000008A3;  -- sb x0,17(x0)
+011 : 01402883;  -- lw x17,20(x0)
+012 : 01002903;  -- lw x18,16(x0)
+013 : 00310463;  -- beq x2,x3,8
+014 : 00146413;  -- ori x8,x8,1
+015 : 00311463;  -- bne x2,x3,8
+016 : 00148493;  -- addi x9,x9,1
+017 : 00246413;  -- ori x8,x8,2
+018 : 00319463;  -- bne x3,x3,8
+019 : 00446413;  -- ori x8,x8,4
+01A : 00314463;  -- blt x2,x3,8
+01B : 00148493;  -- addi x9,x9,1
+01C : 00846413;  -- ori x8,x8,8
+01D : 0021C463;  -- blt x3,x2,8
+01E : 01046413;  -- ori x8,x8,16
+01F : 0021D463;  -- bge x3,x2,8
+020 : 00148493;  -- addi x9,x9,1
+021 : 02046413;  -- ori x8,x8,32
+022 : 00315463;  -- bge x2,x3,8
+023 : 04046413;  -- ori x8,x8,64
+024 : 0021E463;  -- bltu x3,x2,8
+025 : 00148493;  -- addi x9,x9,1
+026 : 08046413;  -- ori x8,x8,128
+027 : 00316463;  -- bltu x2,x3,8
+028 : 10046413;  -- ori x8,x8,256
+029 : 00317463;  -- bgeu x2,x3,8
+02A : 00148493;  -- addi x9,x9,1
+02B : 20046413;  -- ori x8,x8,512
+02C : 0021F463;  -- bgeu x3,x2,8
+02D : 40046413;  -- ori x8,x8,1024
+02E : 0080056F;  -- jal x10,8
+02F : 00148493;  -- addi x9,x9,1
+030 : 00000597;  -- auipc x11,0
+031 : 01158667;  -- jalr x12,x11,17
+032 : 00148493;  -- addi x9,x9,1
+033 : 00148493;  -- addi x9,x9,1
+034 : 00C006EF;  -- jal x13,12
+035 : 00170793;  -- addi x15,x14,1
+036 : 00C0006F;  -- jal x0,12
+037 : 00700713;  -- addi x14,x0,7
+038 : 00068067;  -- jalr x0,x13,0
+039 : 02802023;  -- sw x8,32(x0)
+03A : 02902223;  -- sw x9,36(x0)
+03B : 02A02423;  -- sw x10,40(x0)
+03C : 02C02623;  -- sw x12,44(x0)
+03D : 02F02823;  -- sw x15,48(x0)
+03E : 10000463;  -- beq x0,x0,264  [-> dump @ 0x80]
+[03F..07F] : 00000013;  -- nop
+
+080 : 1E102023;  -- sw x1,480(x0)             x1 -> dmem[0x78]
+081 : 1E202223;  -- sw x2,484(x0)             x2 -> dmem[0x79]
+082 : 1E302423;  -- sw x3,488(x0)             x3 -> dmem[0x7A]
+083 : 1E402623;  -- sw x4,492(x0)             x4 -> dmem[0x7B]
+084 : 1E502823;  -- sw x5,496(x0)             x5 -> dmem[0x7C]
+085 : 1E602A23;  -- sw x6,500(x0)             x6 -> dmem[0x7D]
+086 : 1E702C23;  -- sw x7,504(x0)             x7 -> dmem[0x7E]
+087 : 1E802E23;  -- sw x8,508(x0)             x8 -> dmem[0x7F]
+088 : 20002783;  -- lw x15,512(x0)            x15 = 0x410  UART TX/status
+089 : 20402883;  -- lw x17,516(x0)            x17 = 0x200  tx_busy mask
+08A : 20802903;  -- lw x18,520(x0)            x18 = 4      step
+08B : 20C02A03;  -- lw x20,524(x0)            x20 = 0x400  MMIO base
+08C : 21002A83;  -- lw x21,528(x0)            x21 = 0x1FF  LEDG all-on
+08D : 21402B83;  -- lw x23,532(x0)            x23 = 0x80   saves start
+08E : 21802C03;  -- lw x24,536(x0)            x24 = 0xFC   saves end
+08F : 01278B33;  -- add x22,x15,x18           x22 = 0x414  CYCLE MMIO
+090 : 000B2983;  -- lw x19,0(x22)             x19 = cycle count
+091 : 0007A683;  -- lw x13,0(x15)             POLL: read UART status
+092 : 0116F6B3;  -- and x13,x13,x17                 isolate tx_busy
+093 : 00068463;  -- beq x13,x0,8                    free? -> SEND
+094 : FE000AE3;  -- beq x0,x0,-12                   busy? -> POLL
+095 : 0137A023;  -- sw x19,0(x15)             SEND  cycles (4 bytes hw)
+096 : 000B8733;  -- add x14,x23,x0            x14 = 0x80  saves start ptr
+097 : 000C0833;  -- add x16,x24,x0            x16 = 0xFC  saves end ptr
+098 : 00072983;  -- lw x19,0(x14)             REG_LOOP: load saved reg
+099 : 0007A683;  -- lw x13,0(x15)             POLL
+09A : 0116F6B3;  -- and x13,x13,x17                 isolate tx_busy
+09B : 00068463;  -- beq x13,x0,8                    free? -> SEND
+09C : FE000AE3;  -- beq x0,x0,-12                   busy? -> POLL
+09D : 0137A023;  -- sw x19,0(x15)             SEND  reg (4 bytes hw)
+09E : 01270733;  -- add x14,x14,x18                 ptr += 4
+09F : 01070463;  -- beq x14,x16,8                   done? skip loop-back
+0A0 : FE0000E3;  -- beq x0,x0,-32                   -> REG_LOOP
+0A1 : 00000733;  -- add x14,x0,x0             x14 = 0     mem start ptr
+0A2 : 000B8833;  -- add x16,x23,x0            x16 = 0x80  mem end ptr
+0A3 : 00072983;  -- lw x19,0(x14)             MEM_LOOP: load mem word
+0A4 : 0007A683;  -- lw x13,0(x15)             POLL
+0A5 : 0116F6B3;  -- and x13,x13,x17                 isolate tx_busy
+0A6 : 00068463;  -- beq x13,x0,8                    free? -> SEND
+0A7 : FE000AE3;  -- beq x0,x0,-12                   busy? -> POLL
+0A8 : 0137A023;  -- sw x19,0(x15)             SEND  mem word (4 bytes hw)
+0A9 : 01270733;  -- add x14,x14,x18                 ptr += 4
+0AA : 01070463;  -- beq x14,x16,8                   done? skip loop-back
+0AB : FE0000E3;  -- beq x0,x0,-32                   -> MEM_LOOP
+0AC : 015A2623;  -- sw x21,12(x20)            LEDG[8:0] = 0x1FF  (addr 0x40C)
+0AD : 00000063;  -- beq x0,x0,0               halt: infinite loop
+[0AE..0FF] : 00000013;  -- nop
+
+END;
