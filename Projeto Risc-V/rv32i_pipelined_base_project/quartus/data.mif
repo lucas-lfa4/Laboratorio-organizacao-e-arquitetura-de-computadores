@@ -1,5 +1,5 @@
 -- ============================================================
--- data.mif â€” gerado por: python assembler.py --dump
+-- data.mif — gerado por: python assembler.py --dump
 --
 -- 0x000..0x01F : area do usuario  (byte 0x000..0x07C)
 -- 0x078..0x07F : saves x1-x8   (byte 0x1E0..0x1FC, escritos em runtime)

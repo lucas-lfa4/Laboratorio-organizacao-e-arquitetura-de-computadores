@@ -1,0 +1,168 @@
+Teste completo RV32I -- as 37 instrucoes (assembler/completo.asm)
+
+Operandos: A = x1 = 0x87654321 (negativo com sinal)   B = x2 = 0x00000F0C (B[4:0] = 12)
+Cada resultado e gravado num endereco proprio da memoria: se uma instrucao falhar,
+so o endereco dela fica diferente.
+
+Endereco  Codigo    Instrucao             Comentario
+--------------------------------------------------------------------------------------------
+0x000     876540B7  lui x1,-493996        x1 = 0x87654000  (LUI; -493996 = 0x87654 em 20 bits)
+0x004     32108093  addi x1,x1,801        x1 = A = 0x87654321  (negativo com sinal)
+0x008     40C00113  addi x2,x0,1036       x2 = 0x0000040C
+0x00C     40010113  addi x2,x2,1024       x2 = 0x0000080C
+0x010     70010113  addi x2,x2,1792       x2 = B = 0x00000F0C  (positivo; B[4:0] = 12)
+0x014     00000413  addi x8,x0,0          x8 = 0  (contador de testes de branch que passaram)
+0x018     00000493  addi x9,x0,0          x9 = 0  (contador de erros)
+0x01C     00208533  add x10,x1,x2         ADD
+0x020     00A02023  sw x10,0(x0)          M[0x00] = A + B
+0x024     40208533  sub x10,x1,x2         SUB
+0x028     00A02223  sw x10,4(x0)          M[0x04] = A - B
+0x02C     00209533  sll x10,x1,x2         SLL
+0x030     00A02423  sw x10,8(x0)          M[0x08] = A << 12
+0x034     0020A533  slt x10,x1,x2         SLT
+0x038     00A02623  sw x10,12(x0)         M[0x0C] = 1  (A < B com sinal: negativo < positivo)
+0x03C     0020B533  sltu x10,x1,x2        SLTU
+0x040     00A02823  sw x10,16(x0)         M[0x10] = 0  (A < B sem sinal? nao: 0x8765... e enorme)
+0x044     0020C533  xor x10,x1,x2         XOR
+0x048     00A02A23  sw x10,20(x0)         M[0x14] = A ^ B
+0x04C     0020D533  srl x10,x1,x2         SRL
+0x050     00A02C23  sw x10,24(x0)         M[0x18] = A >> 12 (logico, entra 0)
+0x054     4020D533  sra x10,x1,x2         SRA
+0x058     00A02E23  sw x10,28(x0)         M[0x1C] = A >>> 12 (aritmetico, entra 1)
+0x05C     0020E533  or x10,x1,x2          OR
+0x060     02A02023  sw x10,32(x0)         M[0x20] = A | B
+0x064     0020F533  and x10,x1,x2         AND
+0x068     02A02223  sw x10,36(x0)         M[0x24] = A & B
+0x06C     FFF08513  addi x10,x1,-1        ADDI com imediato negativo (nao pode virar SUB)
+0x070     02A02423  sw x10,40(x0)         M[0x28] = A - 1
+0x074     0050A513  slti x10,x1,5         SLTI
+0x078     02A02623  sw x10,44(x0)         M[0x2C] = 1  (A < 5 com sinal)
+0x07C     0050B513  sltiu x10,x1,5        SLTIU
+0x080     02A02823  sw x10,48(x0)         M[0x30] = 0  (A < 5 sem sinal? nao)
+0x084     FFF0C513  xori x10,x1,-1        XORI com -1 = NOT
+0x088     02A02A23  sw x10,52(x0)         M[0x34] = ~A
+0x08C     0F00E513  ori x10,x1,240        ORI
+0x090     02A02C23  sw x10,56(x0)         M[0x38] = A | 0xF0
+0x094     7FF0F513  andi x10,x1,2047      ANDI
+0x098     02A02E23  sw x10,60(x0)         M[0x3C] = A & 0x7FF
+0x09C     00809513  slli x10,x1,8         SLLI
+0x0A0     04A02023  sw x10,64(x0)         M[0x40] = A << 8
+0x0A4     0080D513  srli x10,x1,8         SRLI
+0x0A8     04A02223  sw x10,68(x0)         M[0x44] = A >> 8 (logico)
+0x0AC     4080D513  srai x10,x1,8         SRAI
+0x0B0     04A02423  sw x10,72(x0)         M[0x48] = A >>> 8 (aritmetico)
+0x0B4     12345537  lui x10,74565         LUI 0x12345
+0x0B8     04A02623  sw x10,76(x0)         M[0x4C] = 0x12345000
+0x0BC     00001517  auipc x10,1           AUIPC: PC desta instrucao + 0x1000
+0x0C0     04A02823  sw x10,80(x0)         M[0x50] = PC + 0x1000
+0x0C4     04102A23  sw x1,84(x0)          SW: M[0x54] = A  (bytes 21 43 65 87)
+0x0C8     05700183  lb x3,87(x0)          LB  byte 0x87 -> x3 = 0xFFFFFF87
+0x0CC     05704203  lbu x4,87(x0)         LBU byte 0x87 -> x4 = 0x00000087
+0x0D0     05601283  lh x5,86(x0)          LH  half 0x8765 -> x5 = 0xFFFF8765
+0x0D4     05605303  lhu x6,86(x0)         LHU half 0x8765 -> x6 = 0x00008765
+0x0D8     05402383  lw x7,84(x0)          LW -> x7 = A
+0x0DC     04202C23  sw x2,88(x0)          SW: M[0x58] = 0x00000F0C
+0x0E0     04100DA3  sb x1,91(x0)          SB: byte 3 = 0x21 -> M[0x58] = 0x21000F0C
+0x0E4     04101C23  sh x1,88(x0)          SH: metade de baixo = 0x4321 -> M[0x58] = 0x21004321
+0x0E8     00418463  beq x3,x4,8           1  BEQ  nao toma
+0x0EC     00140413  addi x8,x8,1             passou
+0x0F0     00420463  beq x4,x4,8           2  BEQ  toma
+0x0F4     00148493  addi x9,x9,1             ERRO se executar
+0x0F8     00140413  addi x8,x8,1             passou
+0x0FC     00419463  bne x3,x4,8           3  BNE  toma
+0x100     00148493  addi x9,x9,1             ERRO se executar
+0x104     00140413  addi x8,x8,1             passou
+0x108     00421463  bne x4,x4,8           4  BNE  nao toma
+0x10C     00140413  addi x8,x8,1             passou
+0x110     0041C463  blt x3,x4,8           5  BLT  toma (-121 < 135)
+0x114     00148493  addi x9,x9,1             ERRO se executar
+0x118     00140413  addi x8,x8,1             passou
+0x11C     00324463  blt x4,x3,8           6  BLT  nao toma
+0x120     00140413  addi x8,x8,1             passou
+0x124     00325463  bge x4,x3,8           7  BGE  toma
+0x128     00148493  addi x9,x9,1             ERRO se executar
+0x12C     00140413  addi x8,x8,1             passou
+0x130     0041D463  bge x3,x4,8           8  BGE  nao toma
+0x134     00140413  addi x8,x8,1             passou
+0x138     00326463  bltu x4,x3,8          9  BLTU toma (0x87 < 0xFFFFFF87 sem sinal)
+0x13C     00148493  addi x9,x9,1             ERRO se executar
+0x140     00140413  addi x8,x8,1             passou
+0x144     0041E463  bltu x3,x4,8          10 BLTU nao toma
+0x148     00140413  addi x8,x8,1             passou
+0x14C     0041F463  bgeu x3,x4,8          11 BGEU toma
+0x150     00148493  addi x9,x9,1             ERRO se executar
+0x154     00140413  addi x8,x8,1             passou
+0x158     00327463  bgeu x4,x3,8          12 BGEU nao toma
+0x15C     00140413  addi x8,x8,1             passou  -> x8 final = 12
+0x160     008005EF  jal x11,8             JAL: x11 = PC+4, pula a proxima
+0x164     00148493  addi x9,x9,1             ERRO se executar
+0x168     00000617  auipc x12,0           x12 = PC desta instrucao
+0x16C     00D606E7  jalr x13,x12,13       JALR: PC = (x12+13)&~1 = x12+12 ; x13 = PC+4
+0x170     00148493  addi x9,x9,1             ERRO se executar
+0x174     00C0076F  jal x14,12            chama FUNC ; x14 = endereco de retorno
+0x178     00178813  addi x16,x15,1        RET: x16 = x15 + 1 = 8
+0x17C     00C0006F  jal x0,12             pula por cima da FUNC
+0x180     00700793  addi x15,x0,7         FUNC: x15 = 7
+0x184     00070067  jalr x0,x14,0         retorna para RET
+0x188     04802E23  sw x8,92(x0)          M[0x5C] = 12  (branches que passaram)
+0x18C     06902023  sw x9,96(x0)          M[0x60] = 0   (erros)
+0x190     06B02223  sw x11,100(x0)        M[0x64] = link do JAL
+0x194     06D02423  sw x13,104(x0)        M[0x68] = link do JALR
+0x198     07002623  sw x16,108(x0)        M[0x6C] = 8   (chamada/retorno)
+0x19C     00113533  sltu x10,x2,x1        SLTU com resultado 1
+0x1A0     06A02823  sw x10,112(x0)        M[0x70] = 1  (B < A sem sinal)
+0x1A4     FFF13513  sltiu x10,x2,-1       SLTIU: o -1 vira 0xFFFFFFFF (estende sinal, compara sem sinal)
+0x1A8     06A02A23  sw x10,116(x0)        M[0x74] = 1  (0xF0C < 0xFFFFFFFF sem sinal)
+0x1AC     00000063  beq x0,x0,0           halt (so na versao de simulacao)
+
+============================================================================================
+VALORES ESPERADOS -- iguais no ModelSim e no dump da placa
+============================================================================================
+
+Registradores (o dump da placa mostra x1-x8):
+  x1  = 0x87654321   A
+  x2  = 0x00000F0C   B
+  x3  = 0xFFFFFF87   LB  (byte 0x87 com sinal)
+  x4  = 0x00000087   LBU (byte 0x87 sem sinal)
+  x5  = 0xFFFF8765   LH  (0x8765 com sinal)
+  x6  = 0x00008765   LHU (0x8765 sem sinal)
+  x7  = 0x87654321   LW
+  x8  = 0x0000000C   branches que passaram (12)
+
+Memoria de dados:
+  Endereco  Valor        Instrucao   O que e
+  0x00      0x8765522D   ADD         A + B
+  0x04      0x87653415   SUB         A - B
+  0x08      0x54321000   SLL         A << 12
+  0x0C      0x00000001   SLT         A < B com sinal
+  0x10      0x00000000   SLTU        A < B sem sinal
+  0x14      0x87654C2D   XOR         A ^ B
+  0x18      0x00087654   SRL         A >> 12 logico
+  0x1C      0xFFF87654   SRA         A >> 12 aritmetico
+  0x20      0x87654F2D   OR          A | B
+  0x24      0x00000300   AND         A & B
+  0x28      0x87654320   ADDI        A + (-1)
+  0x2C      0x00000001   SLTI        A < 5 com sinal
+  0x30      0x00000000   SLTIU       A < 5 sem sinal
+  0x34      0x789ABCDE   XORI        A ^ -1 (= ~A)
+  0x38      0x876543F1   ORI         A | 0xF0
+  0x3C      0x00000321   ANDI        A & 0x7FF
+  0x40      0x65432100   SLLI        A << 8
+  0x44      0x00876543   SRLI        A >> 8 logico
+  0x48      0xFF876543   SRAI        A >> 8 aritmetico
+  0x4C      0x12345000   LUI         0x12345 << 12
+  0x50      0x000010BC   AUIPC       PC (0x0BC) + 0x1000
+  0x54      0x87654321   SW          palavra usada pelos loads
+  0x58      0x21004321   SW+SB+SH    0x00000F0C -> SB byte3 -> SH metade baixa
+  0x5C      0x0000000C   branches    testes de branch que passaram (12)
+  0x60      0x00000000   branches    instrucoes executadas indevidamente (0)
+  0x64      0x00000164   JAL         endereco de retorno
+  0x68      0x00000170   JALR        endereco de retorno
+  0x6C      0x00000008   JAL+JALR    chamada de funcao e retorno
+  0x70      0x00000001   SLTU        B < A sem sinal
+  0x74      0x00000001   SLTIU       B < 0xFFFFFFFF sem sinal (imediato -1)
+
+Enderecos 0x78 e 0x7C ficam em 0.
+Na placa: python serial_dump.py COMx --baud 1920   (os 0x... acima aparecem na secao 'Memoria de Dados').
+No ModelSim o testbench so imprime o estado final de dmem[0..15] (ate 0x3C), mas TODAS as escritas
+aparecem nas linhas 'MEM[...]' do Transcript e sao comparadas com o golden.txt.
