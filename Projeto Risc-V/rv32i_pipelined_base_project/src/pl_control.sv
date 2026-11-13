@@ -7,24 +7,28 @@
 //
 // Instrucoes suportadas:
 //   R-type  (0110011): add, sub, and, or, xor, sll, srl, sra, slt, sltu
-//   I-type  (0010011): addi, andi, ori, slti, slli, srli, srai (+ xori, sltiu)
+//   I-type  (0010011): addi, andi, ori, xori, slti, sltiu, slli, srli, srai
 //   U-type  (0110111): lui
 //   U-type  (0010111): auipc
-//   I-type  (0000011): lw
-//   S-type  (0100011): sw
-//   B-type  (1100011): beq
+//   I-type  (0000011): lb, lh, lw, lbu, lhu   (largura escolhida por funct3)
+//   S-type  (0100011): sb, sh, sw             (largura escolhida por funct3)
+//   B-type  (1100011): beq, bne, blt, bge, bltu, bgeu (condicao por funct3)
+//   J-type  (1101111): jal
+//   I-type  (1100111): jalr
 //
 // Tabela de sinais de controle:
-//   Sinal     | R-type | I-arit | lui | auipc | lw | sw | beq
-//   ----------|--------|--------|-----|-------|----|----|-----
-//   ALUSrc    |   0    |   1    |  1  |   1   |  1 |  1 |  0    0=reg, 1=imm
-//   ALUSrcA   |   00   |   00   |  10 |   01  | 00 | 00 | 00    00=rs1, 01=PC, 10=zero
-//   MemtoReg  |   0    |   0    |  0  |   0   |  1 |  - |  -    0=ALU, 1=mem
-//   RegWrite  |   1    |   1    |  1  |   1   |  1 |  0 |  0
-//   MemRead   |   0    |   0    |  0  |   0   |  1 |  0 |  0
-//   MemWrite  |   0    |   0    |  0  |   0   |  0 |  1 |  0
-//   Branch    |   0    |   0    |  0  |   0   |  0 |  0 |  1
-//   ALUOp     |   10   |   11   |  00 |   00  | 00 | 00 | 01
+//   Sinal     | R  | I-arit | lui | auipc | load | store | branch | jal | jalr
+//   ----------|----|--------|-----|-------|------|-------|--------|-----|-----
+//   ALUSrc    | 0  |   1    |  1  |   1   |  1   |   1   |   0    |  -  |  1
+//   ALUSrcA   | 00 |   00   |  10 |   01  |  00  |   00  |   00   |  -  |  00
+//   MemtoReg  | 0  |   0    |  0  |   0   |  1   |   -   |   -    |  0  |  0
+//   RegWrite  | 1  |   1    |  1  |   1   |  1   |   0   |   0    |  1  |  1
+//   MemRead   | 0  |   0    |  0  |   0   |  1   |   0   |   0    |  0  |  0
+//   MemWrite  | 0  |   0    |  0  |   0   |  0   |   1   |   0    |  0  |  0
+//   Branch    | 0  |   0    |  0  |   0   |  0   |   0   |   1    |  0  |  0
+//   Jal       | 0  |   0    |  0  |   0   |  0   |   0   |   0    |  1  |  0
+//   Jalr      | 0  |   0    |  0  |   0   |  0   |   0   |   0    |  0  |  1
+//   ALUOp     | 10 |   11   |  00 |   00  |  00  |   00  |   01   |  00 |  00
 // =============================================================================
 
 `timescale 1ns / 1ps
@@ -38,6 +42,8 @@ module pl_control (
     output logic       MemRead,
     output logic       MemWrite,
     output logic       Branch,
+    output logic       Jal,
+    output logic       Jalr,
     output logic [1:0] ALUOp
 );
 
@@ -48,6 +54,8 @@ module pl_control (
     localparam LOAD   = 7'b0000011;
     localparam STORE  = 7'b0100011;
     localparam BRANCH = 7'b1100011;
+    localparam JAL    = 7'b1101111;
+    localparam JALR   = 7'b1100111;
 
     always_comb begin
         ALUSrc   = 1'b0;
@@ -57,6 +65,8 @@ module pl_control (
         MemRead  = 1'b0;
         MemWrite = 1'b0;
         Branch   = 1'b0;
+        Jal      = 1'b0;
+        Jalr     = 1'b0;
         ALUOp    = 2'b00;
 
         case (Opcode)
@@ -66,7 +76,7 @@ module pl_control (
                 RegWrite = 1'b1;
                 ALUOp    = 2'b10;
             end
-            OP_IMM: begin               // addi, andi, ori, slti, slli, srli, srai
+            OP_IMM: begin               // addi, andi, ori, xori, slti, slli, srli, srai
                 ALUSrc   = 1'b1;        // B = imediato
                 RegWrite = 1'b1;
                 ALUOp    = 2'b11;       // decodificar funct3 (pl_alu_ctrl)
@@ -83,21 +93,31 @@ module pl_control (
                 RegWrite = 1'b1;
                 ALUOp    = 2'b00;       // ADD
             end
-            LOAD: begin
+            LOAD: begin                 // lb, lh, lw, lbu, lhu
                 ALUSrc   = 1'b1;
                 MemtoReg = 1'b1;
                 RegWrite = 1'b1;
                 MemRead  = 1'b1;
-                ALUOp    = 2'b00;
+                ALUOp    = 2'b00;       // endereco = rs1 + imm
             end
-            STORE: begin
+            STORE: begin                // sb, sh, sw
                 ALUSrc   = 1'b1;
                 MemWrite = 1'b1;
-                ALUOp    = 2'b00;
+                ALUOp    = 2'b00;       // endereco = rs1 + imm
             end
-            BRANCH: begin
-                Branch   = 1'b1;
+            BRANCH: begin               // beq, bne, blt, bge, bltu, bgeu
+                Branch   = 1'b1;        // condicao avaliada no estagio EX
                 ALUOp    = 2'b01;
+            end
+            JAL: begin                  // rd = PC+4 ; PC = PC + imm
+                Jal      = 1'b1;
+                RegWrite = 1'b1;
+            end
+            JALR: begin                 // rd = PC+4 ; PC = (rs1 + imm) & ~1
+                Jalr     = 1'b1;
+                ALUSrc   = 1'b1;        // ALU calcula rs1 + imm (alvo)
+                RegWrite = 1'b1;
+                ALUOp    = 2'b00;       // ADD
             end
             default: ; // sinais permanecem em zero (seguro)
         endcase

@@ -12,7 +12,7 @@
 // Tratamento de hazards:
 //   Load-use stall : 1 ciclo de bolha (pl_hazard)
 //   RAW data       : forwarding EX/MEM -> EX e MEM/WB -> EX (pl_forward)
-//   Branch taken   : flush de IF e ID (2 NOPs) na resolucao em EX
+//   Branch taken / JAL / JALR : flush de IF e ID (2 NOPs) na resolucao em EX
 //
 // Decodificacao de endereco (estagio MEM):
 //   alu_result[10] = 0 -> memoria de dados  (0x000-0x3FF)
@@ -36,6 +36,8 @@ module pl_datapath (
     input  logic        MemRead,
     input  logic        MemWrite,
     input  logic        Branch,
+    input  logic        Jal,
+    input  logic        Jalr,
     input  logic [1:0]  ALUOp,
 
     // Codigo de operacao da ALU (pl_alu_ctrl, usa campos do estagio EX)
@@ -81,8 +83,10 @@ module pl_datapath (
 
     // Hazard / branch
     logic        stall;
-    logic        pc_src;
-    logic [31:0] branch_target;
+    logic        pc_src;          // 1 = desviar (branch tomado, JAL ou JALR)
+    logic        branch_taken;    // resultado da comparacao do branch
+    logic [31:0] branch_target;   // PC + imm      (branches e JAL)
+    logic [31:0] pc_target;       // alvo final    (JALR usa rs1 + imm)
 
     // ID
     logic [31:0] rd1, rd2, imm_ext;
@@ -91,6 +95,7 @@ module pl_datapath (
     logic [1:0]  fwd_a, fwd_b;
     logic [31:0] fwd_srca, fwd_srcb, alu_srca, alu_srcb;
     logic [31:0] alu_result;
+    logic [31:0] ex_result;       // alu_result ou PC+4 (JAL/JALR)
     logic        zero;
 
     // WB
@@ -99,6 +104,10 @@ module pl_datapath (
     // MEM
     logic        mmio_sel;
     logic [31:0] dmem_rd, mmio_rd, mem_read_data;
+    logic [31:0] load_data;       // dado lido apos selecao de byte/halfword
+    logic [31:0] store_data;      // dado de escrita alinhado (SB/SH/SW)
+    logic [3:0]  byte_en;         // bytes da palavra que serao escritos
+    logic [31:0] dmem_wdata;      // palavra final escrita na dmem
 
     // =========================================================================
     // IF -- Busca de instrucao
@@ -107,7 +116,7 @@ module pl_datapath (
 
     always_ff @(posedge clk or negedge rst_n) begin
         if (!rst_n)      pc_reg <= 32'b0;
-        else if (pc_src) pc_reg <= branch_target;   // branch tem prioridade
+        else if (pc_src) pc_reg <= pc_target;       // desvio tem prioridade
         else if (!stall) pc_reg <= pc_plus4;
         // else stall: PC mantido
     end
@@ -188,6 +197,8 @@ module pl_datapath (
             id_ex.mem_write  <= 1'b0;
             id_ex.alu_op     <= 2'b00;
             id_ex.branch     <= 1'b0;
+            id_ex.jal        <= 1'b0;
+            id_ex.jalr       <= 1'b0;
             id_ex.pc         <= 32'b0;
             id_ex.rd1        <= 32'b0;
             id_ex.rd2        <= 32'b0;
@@ -206,6 +217,8 @@ module pl_datapath (
             id_ex.mem_write  <= 1'b0;
             id_ex.alu_op     <= 2'b00;
             id_ex.branch     <= 1'b0;
+            id_ex.jal        <= 1'b0;
+            id_ex.jalr       <= 1'b0;
             id_ex.pc         <= 32'b0;
             id_ex.rd1        <= 32'b0;
             id_ex.rd2        <= 32'b0;
@@ -224,6 +237,8 @@ module pl_datapath (
             id_ex.mem_write  <= MemWrite;
             id_ex.alu_op     <= ALUOp;
             id_ex.branch     <= Branch;
+            id_ex.jal        <= Jal;
+            id_ex.jalr       <= Jalr;
             id_ex.pc         <= if_id.pc;
             id_ex.rd1        <= rd1;
             id_ex.rd2        <= rd2;
@@ -295,9 +310,32 @@ module pl_datapath (
         .Zero      (zero)
     );
 
-    // Branch resolvido no estagio EX (flush 2 instrucoes se taken)
+    // -------------------------------------------------------------------------
+    // Branch / jumps -- resolvidos no estagio EX (flush de 2 instrucoes)
+    // -------------------------------------------------------------------------
+    // Comparador de branch: usa os operandos ja com forwarding (rs1, rs2).
+    // A condicao e escolhida pelo funct3 da instrucao.
+    always_comb begin
+        case (id_ex.funct3)
+            3'b000:  branch_taken = (fwd_srca == fwd_srcb);                  // BEQ
+            3'b001:  branch_taken = (fwd_srca != fwd_srcb);                  // BNE
+            3'b100:  branch_taken = ($signed(fwd_srca) <  $signed(fwd_srcb)); // BLT
+            3'b101:  branch_taken = ($signed(fwd_srca) >= $signed(fwd_srcb)); // BGE
+            3'b110:  branch_taken = (fwd_srca <  fwd_srcb);                  // BLTU
+            3'b111:  branch_taken = (fwd_srca >= fwd_srcb);                  // BGEU
+            default: branch_taken = 1'b0;
+        endcase
+    end
+
+    // Alvos:
+    //   branches e JAL -> PC + imm
+    //   JALR           -> (rs1 + imm) & ~1   (a soma e feita pela ALU)
     assign branch_target = id_ex.pc + id_ex.imm_ext;
-    assign pc_src        = id_ex.branch && zero;
+    assign pc_target     = id_ex.jalr ? {alu_result[31:1], 1'b0} : branch_target;
+    assign pc_src        = (id_ex.branch && branch_taken) || id_ex.jal || id_ex.jalr;
+
+    // JAL/JALR escrevem o endereco de retorno (PC+4) em rd
+    assign ex_result = (id_ex.jal || id_ex.jalr) ? (id_ex.pc + 32'd4) : alu_result;
 
     // =========================================================================
     // Registrador EX/MEM
@@ -317,7 +355,7 @@ module pl_datapath (
             ex_mem.reg_write   <= id_ex.reg_write;
             ex_mem.mem_read    <= id_ex.mem_read;
             ex_mem.mem_write   <= id_ex.mem_write;
-            ex_mem.alu_result  <= alu_result;
+            ex_mem.alu_result  <= ex_result;   // inclui PC+4 de JAL/JALR
             ex_mem.write_data  <= fwd_srcb;   // rs2 adiantado (para SW/MMIO)
             ex_mem.rd          <= id_ex.rd;
             ex_mem.funct3      <= id_ex.funct3;
@@ -329,11 +367,42 @@ module pl_datapath (
     // =========================================================================
     assign mmio_sel = ex_mem.alu_result[10];
 
+    // -------------------------------------------------------------------------
+    // Stores: SB / SH / SW
+    // -------------------------------------------------------------------------
+    // A dmem e organizada em palavras de 32 bits. Para SB/SH, o dado de rs2 e
+    // replicado nas posicoes possiveis e byte_en indica quais bytes mudam,
+    // conforme o offset alu_result[1:0] (little-endian: byte 0 = bits 7:0).
+    always_comb begin
+        case (ex_mem.funct3[1:0])
+            2'b00: begin                                       // SB
+                store_data = {4{ex_mem.write_data[7:0]}};
+                byte_en    = 4'b0001 << ex_mem.alu_result[1:0];
+            end
+            2'b01: begin                                       // SH
+                store_data = {2{ex_mem.write_data[15:0]}};
+                byte_en    = ex_mem.alu_result[1] ? 4'b1100 : 4'b0011;
+            end
+            default: begin                                     // SW
+                store_data = ex_mem.write_data;
+                byte_en    = 4'b1111;
+            end
+        endcase
+    end
+
+    // Read-modify-write: a leitura da dmem e assincrona, entao a palavra atual
+    // (dmem_rd) esta disponivel no mesmo ciclo. Os bytes habilitados vem do
+    // store_data e os demais sao mantidos.
+    assign dmem_wdata = { byte_en[3] ? store_data[31:24] : dmem_rd[31:24],
+                          byte_en[2] ? store_data[23:16] : dmem_rd[23:16],
+                          byte_en[1] ? store_data[15:8]  : dmem_rd[15:8],
+                          byte_en[0] ? store_data[7:0]   : dmem_rd[7:0] };
+
     pl_dmem dmem (
         .clk       (clk),
         .MemWrite  (ex_mem.mem_write & ~mmio_sel),
         .addr      (ex_mem.alu_result[9:2]),
-        .WriteData (ex_mem.write_data),
+        .WriteData (dmem_wdata),
         .ReadData  (dmem_rd)
     );
 
@@ -355,10 +424,38 @@ module pl_datapath (
 
     assign mem_read_data = mmio_sel ? mmio_rd : dmem_rd;
 
+    // -------------------------------------------------------------------------
+    // Loads: LB / LH / LW / LBU / LHU
+    // -------------------------------------------------------------------------
+    // Seleciona o byte/halfword pelo offset alu_result[1:0] e estende com
+    // sinal (LB, LH) ou com zeros (LBU, LHU). Feito no estagio MEM, entao o
+    // forwarding MEM/WB -> EX ja recebe o valor final.
+    logic [7:0]  ld_byte;
+    logic [15:0] ld_half;
+
+    always_comb begin
+        case (ex_mem.alu_result[1:0])
+            2'b00:   ld_byte = mem_read_data[7:0];
+            2'b01:   ld_byte = mem_read_data[15:8];
+            2'b10:   ld_byte = mem_read_data[23:16];
+            default: ld_byte = mem_read_data[31:24];
+        endcase
+
+        ld_half = ex_mem.alu_result[1] ? mem_read_data[31:16] : mem_read_data[15:0];
+
+        case (ex_mem.funct3)
+            3'b000:  load_data = {{24{ld_byte[7]}},  ld_byte};   // LB
+            3'b001:  load_data = {{16{ld_half[15]}}, ld_half};   // LH
+            3'b100:  load_data = {24'b0, ld_byte};               // LBU
+            3'b101:  load_data = {16'b0, ld_half};               // LHU
+            default: load_data = mem_read_data;                  // LW
+        endcase
+    end
+
     // Saidas de observabilidade para o testbench
     assign mem_wr_en   = ex_mem.mem_write & ~mmio_sel;
     assign mem_wr_addr = ex_mem.alu_result[9:2];
-    assign mem_wr_data = ex_mem.write_data;
+    assign mem_wr_data = dmem_wdata;     // palavra completa apos SB/SH/SW
 
     // =========================================================================
     // Registrador MEM/WB
@@ -374,7 +471,7 @@ module pl_datapath (
             mem_wb.mem_to_reg <= ex_mem.mem_to_reg;
             mem_wb.reg_write  <= ex_mem.reg_write;
             mem_wb.alu_result <= ex_mem.alu_result;
-            mem_wb.read_data  <= mem_read_data;
+            mem_wb.read_data  <= load_data;   // ja com selecao/extensao
             mem_wb.rd         <= ex_mem.rd;
         end
     end

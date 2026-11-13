@@ -4,10 +4,15 @@
 //
 // Codificacao de operacao (Operation[3:0]):
 //   4'd01 : ADD  -- adicao com sinal
-//   4'd02 : SUB  -- subtracao com sinal  (BEQ usa Zero)
+//   4'd02 : SUB  -- subtracao com sinal
 //   4'd04 : OR   -- OU bit a bit
 //   4'd05 : AND  -- E bit a bit
+//   4'd06 : XOR  -- OU exclusivo bit a bit
+//   4'd07 : SLL  -- deslocamento logico a esquerda  (usa SrcB[4:0])
+//   4'd08 : SRL  -- deslocamento logico a direita   (usa SrcB[4:0])
+//   4'd09 : SRA  -- deslocamento aritmetico a direita (usa SrcB[4:0])
 //   4'd11 : SLT  -- set-less-than com sinal
+//   4'd12 : SLTU -- set-less-than sem sinal
 // =============================================================================
 
 `timescale 1ns / 1ps

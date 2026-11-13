@@ -7,6 +7,9 @@
 //   I-type (addi, andi, ori, slti, slli, srli, srai): imm[11:0] = inst[31:20]
 //                  (nos shifts, a ALU usa apenas imm[4:0] = shamt)
 //   U-type (lui, auipc): imm[31:12] = inst[31:12], imm[11:0] = 0
+//   I-type (jalr): imm[11:0] = inst[31:20]
+//   J-type (jal)  : imm[20]=inst[31], imm[19:12]=inst[19:12], imm[11]=inst[20],
+//                   imm[10:1]=inst[30:21], imm[0]=0
 //   S-type (sw)  : imm[11:5]  = inst[31:25], imm[4:0] = inst[11:7]
 //   B-type (beq) : imm[12]=inst[31], imm[11]=inst[7], imm[10:5]=inst[30:25],
 //                  imm[4:1]=inst[11:8], imm[0]=0
@@ -23,13 +26,16 @@ module pl_sign_ext (
     localparam OP_IMM = 7'b0010011;
     localparam LUI    = 7'b0110111;
     localparam AUIPC  = 7'b0010111;
+    localparam JAL    = 7'b1101111;
+    localparam JALR   = 7'b1100111;
     localparam STORE  = 7'b0100011;
     localparam BRANCH = 7'b1100011;
 
     always_comb begin
         case (Instr[6:0])
             LOAD,
-            OP_IMM: ImmExt = {{20{Instr[31]}}, Instr[31:20]};
+            OP_IMM,
+            JALR:   ImmExt = {{20{Instr[31]}}, Instr[31:20]};
 
             LUI,
             AUIPC:  ImmExt = {Instr[31:12], 12'b0};
@@ -38,6 +44,9 @@ module pl_sign_ext (
 
             BRANCH: ImmExt = {{19{Instr[31]}}, Instr[31], Instr[7],
                                Instr[30:25], Instr[11:8], 1'b0};
+
+            JAL:    ImmExt = {{11{Instr[31]}}, Instr[31], Instr[19:12],
+                               Instr[20], Instr[30:21], 1'b0};
 
             default: ImmExt = 32'b0;
         endcase

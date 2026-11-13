@@ -28,6 +28,8 @@ package pl_pipe_pkg;
         logic        mem_write;
         logic [1:0]  alu_op;
         logic        branch;
+        logic        jal;        // salto incondicional relativo ao PC
+        logic        jalr;       // salto incondicional para rs1 + imm
         // dados
         logic [31:0] pc;
         logic [31:0] rd1;       // saida 1 do banco de registradores
