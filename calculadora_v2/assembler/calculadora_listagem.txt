@@ -1,0 +1,334 @@
+CALCULADORA INTERATIVA v2 -- as 37 instrucoes do RV32I na DE2-115
+======================================================================================
+
+Legenda das chaves:  + = para cima (1)   - = para baixo (0)
+
+CONTROLES
+  SW17..SW14  escolhem a operacao dentro do grupo (0 a 15)
+  KEY1 segurado  -> grupo 2 (operacoes 16..31)   KEY2 segurado -> grupo 3 (32..47)
+  nenhum dos dois -> grupo 1 (0..15)             (se os dois: vale o KEY2)
+  SW13..SW7   operando A, com sinal (-64..63; SW13 + = negativo)
+  SW6..SW0    operando B, 0..127
+  LEDR17..0   resultado (bits 17..0)
+  KEY3 segurado -> LEDR13..0 mostram os bits 31..18 do resultado
+  LEDG5..0    numero da operacao (0..47): LEDG4 aceso = grupo 2, LEDG5 aceso = grupo 3
+  KEY0        reset
+
+--------------------------------------------------------------------------------------
+GRUPO 1 -- nenhum botao
+--------------------------------------------------------------------------------------
+  Nr  SW17 SW16 SW15 SW14   Instrucao    O que aparece nos LEDR
+  0    -    -    -    -     ADD          A + B
+  1    -    -    -    +     SUB          A - B
+  2    -    -    +    -     AND          A & B
+  3    -    -    +    +     OR           A | B
+  4    -    +    -    -     XOR          A ^ B
+  5    -    +    -    +     SLL          A << B[4:0]
+  6    -    +    +    -     SRL          A >> B[4:0] logico
+  7    -    +    +    +     SRA          A >> B[4:0] aritmetico
+  8    +    -    -    -     SLT          A < B com sinal
+  9    +    -    -    +     SLTU         A < B sem sinal
+  10   +    -    +    -     ADDI         A + 5
+  11   +    -    +    +     XORI         A ^ -1 (NOT A)
+  12   +    +    -    -     SLLI         A << 4
+  13   +    +    -    +     SRLI         A >> 4 logico
+  14   +    +    +    -     SRAI         A >> 4 aritmetico
+  15   +    +    +    +     SLTIU        A < 5 sem sinal
+
+--------------------------------------------------------------------------------------
+GRUPO 2 -- segure KEY1
+--------------------------------------------------------------------------------------
+  Nr  SW17 SW16 SW15 SW14   Instrucao    O que aparece nos LEDR
+  16   -    -    -    -     ANDI         A & 0x55
+  17   -    -    -    +     ORI          A | 0x2A0
+  18   -    -    +    -     SLTI         A < -5 com sinal
+  19   -    -    +    +     LUI          constante 0x12345000
+  20   -    +    -    -     AUIPC        PC da instrucao + 0x1000
+  21   -    +    -    +     LB           byte B[1:0] de 0x8765F0A1, com sinal
+  22   -    +    +    -     LH           metade B[1] de 0x8765F0A1, com sinal
+  23   -    +    +    +     LW           palavra 0x8765F0A1
+  24   +    -    -    -     LBU          byte B[1:0] de 0x8765F0A1, sem sinal
+  25   +    -    -    +     LHU          metade B[1] de 0x8765F0A1, sem sinal
+  26   +    -    +    -     SB           0x11223344 com o byte B[1:0] trocado por A[7:0]
+  27   +    -    +    +     SH           0x11223344 com a metade B[1] trocada por A[15:0]
+  28   +    +    -    -     SW           grava A e le de volta
+  29   +    +    -    +     JAL          endereco de retorno (PC+4)
+  30   +    +    +    -     JALR         endereco de retorno (PC+4)
+  31   +    +    +    +     (mostra A)   valor de A
+
+--------------------------------------------------------------------------------------
+GRUPO 3 -- segure KEY2
+--------------------------------------------------------------------------------------
+  Nr  SW17 SW16 SW15 SW14   Instrucao    O que aparece nos LEDR
+  32   -    -    -    -     BEQ          1 se A = B
+  33   -    -    -    +     BNE          1 se A != B
+  34   -    -    +    -     BLT          1 se A < B com sinal
+  35   -    -    +    +     BGE          1 se A >= B com sinal
+  36   -    +    -    -     BLTU         1 se A < B sem sinal
+  37   -    +    -    +     BGEU         1 se A >= B sem sinal
+  38   -    +    +    -     (mostra B)   valor de B
+  39   -    +    +    +     (livre)      resultado 0
+  40   +    -    -    -     (livre)      resultado 0
+  41   +    -    -    +     (livre)      resultado 0
+  42   +    -    +    -     (livre)      resultado 0
+  43   +    -    +    +     (livre)      resultado 0
+  44   +    +    -    -     (livre)      resultado 0
+  45   +    +    -    +     (livre)      resultado 0
+  46   +    +    +    -     (livre)      resultado 0
+  47   +    +    +    +     (livre)      resultado 0
+
+Detalhes:
+  * Loads (LB, LH, LW, LBU, LHU) leem a palavra fixa 0x8765F0A1 (bytes A1 F0 65 87).
+    B[1:0] = SW1 SW0 escolhe o byte (0..3); nos de meia-palavra so o SW1 conta (0 ou 2).
+  * Stores (SB, SH) partem de 0x11223344 e trocam so o byte/metade escolhido por A;
+    o resultado mostrado e a palavra lida de volta com LW.
+  * Branches mostram 1 se o desvio seria TOMADO e 0 se nao.
+  * LUI, AUIPC, JAL e JALR nao dependem das chaves: mostram valores fixos:
+      LUI = 0x12345000   AUIPC = 0x000011B4   JAL = 0x00000248   JALR = 0x0000025C
+    (AUIPC = endereco da instrucao + 0x1000; JAL/JALR = endereco de retorno PC+4.
+     Se o salto falhasse, o resultado seria 0.)
+
+EXEMPLOS (LEDR17 ... LEDR0)
+  ADD 5 + 3 (grupo 1, op 0):  SW = - - - - | - - - - + - + | - - - - - + +
+     LEDR = 00 0000 0000 0000 1000  (8)
+  LB x LBU, byte 0 = 0xA1 (grupo 2, op 21 / op 24), B = 0:
+     LB : LEDR = 11 1111 1111 1010 0001   (0xFFFFFFA1, sinal estendido)
+     LBU: LEDR = 00 0000 0000 1010 0001   (0x000000A1)
+  BLT x BLTU com A = -1, B = 1 (grupo 3, op 34 / op 36):
+     BLT : LEDR0 aceso (tomado: -1 < 1)    BLTU: LEDR0 apagado (0xFFFFFFFF < 1? nao)
+  SB com A = 5 e B = 2 (grupo 2, op 26): 0x11223344 -> 0x11053344
+     LEDR = 01 0011 0011 0100 0100 ;  com KEY3: LEDR13..0 = 00 0100 0100 0001 (0x0441)
+
+======================================================================================
+PROGRAMA (assembler/calculadora.asm)
+======================================================================================
+Endereco  Codigo    Rotulo  Instrucao             Comentario
+0x000     40000A13          addi x20,x0,1024      x20 = 0x400 (base do MMIO)
+0x004     01900513          addi x10,x0,25        x10 = 25 (estende o sinal de A)
+0x008     8765F837          lui x16,-493985       x16 = 0x8765F000
+0x00C     0A180813          addi x16,x16,161      x16 = 0x8765F0A1 (palavra para os loads)
+0x010     11002023          sw x16,256(x0)        M[0x100] = 0x8765F0A1  (bytes A1 F0 65 87)
+0x014     112236B7          lui x13,70179         x13 = 0x11223000
+0x018     34468693          addi x13,x13,836      x13 = 0x11223344 (palavra base dos stores)
+0x01C     000A2083  LOOP    lw x1,0(x20)          x1 = chaves SW[17:0]
+0x020     00E0D293          srli x5,x1,14         op = SW[17:14]
+0x024     00F2F293          andi x5,x5,15         
+0x028     01209113          slli x2,x1,18         A = SW[13:7] com sinal...
+0x02C     40A15133          sra x2,x2,x10         ...(-64..63)
+0x030     07F0F193          andi x3,x1,127        B = SW[6:0]
+0x034     0031F613          andi x12,x3,3         x12 = B[1:0] (byte escolhido nos loads/stores de byte)
+0x038     0021F713          andi x14,x3,2         x14 = B[1]*2 (meia-palavra escolhida nos de half)
+0x03C     004A2403          lw x8,4(x20)          x8 = botoes KEY (apertado = 0)
+0x040     FFF44493          xori x9,x8,-1         inverte: apertado = 1
+0x044     0044F593          andi x11,x9,4         KEY2 apertado?
+0x048     00059A63          bne x11,x0,20         sim -> grupo 32..47
+0x04C     0024F593          andi x11,x9,2         KEY1 apertado?
+0x050     00058863          beq x11,x0,16         nao -> grupo 0..15
+0x054     01028293          addi x5,x5,16         grupo 16..31
+0x058     0080006F          jal x0,8              
+0x05C     02028293  BANK2   addi x5,x5,32         grupo 32..47
+0x060     005A2623  DISP    sw x5,12(x20)         LEDG = numero da operacao (0..47)
+0x064     00429313          slli x6,x5,4          op * 16 (4 instrucoes por caso)
+0x068     00000397  BASE    auipc x7,0            x7 = endereco desta instrucao
+0x06C     006383B3          add x7,x7,x6          
+0x070     00C38067          jalr x0,x7,12         salta para TABELA + op*16
+0x074     00310233  OP0     add x4,x2,x3          op 0 ADD: A + B
+0x078     2FC0006F          jal x0,764            
+0x07C     00000013          addi x0,x0,0          
+0x080     00000013          addi x0,x0,0          
+0x084     40310233  OP1     sub x4,x2,x3          op 1 SUB: A - B
+0x088     2EC0006F          jal x0,748            
+0x08C     00000013          addi x0,x0,0          
+0x090     00000013          addi x0,x0,0          
+0x094     00317233  OP2     and x4,x2,x3          op 2 AND: A & B
+0x098     2DC0006F          jal x0,732            
+0x09C     00000013          addi x0,x0,0          
+0x0A0     00000013          addi x0,x0,0          
+0x0A4     00316233  OP3     or x4,x2,x3           op 3 OR: A | B
+0x0A8     2CC0006F          jal x0,716            
+0x0AC     00000013          addi x0,x0,0          
+0x0B0     00000013          addi x0,x0,0          
+0x0B4     00314233  OP4     xor x4,x2,x3          op 4 XOR: A ^ B
+0x0B8     2BC0006F          jal x0,700            
+0x0BC     00000013          addi x0,x0,0          
+0x0C0     00000013          addi x0,x0,0          
+0x0C4     00311233  OP5     sll x4,x2,x3          op 5 SLL: A << B[4:0]
+0x0C8     2AC0006F          jal x0,684            
+0x0CC     00000013          addi x0,x0,0          
+0x0D0     00000013          addi x0,x0,0          
+0x0D4     00315233  OP6     srl x4,x2,x3          op 6 SRL: A >> B[4:0] logico
+0x0D8     29C0006F          jal x0,668            
+0x0DC     00000013          addi x0,x0,0          
+0x0E0     00000013          addi x0,x0,0          
+0x0E4     40315233  OP7     sra x4,x2,x3          op 7 SRA: A >> B[4:0] aritmetico
+0x0E8     28C0006F          jal x0,652            
+0x0EC     00000013          addi x0,x0,0          
+0x0F0     00000013          addi x0,x0,0          
+0x0F4     00312233  OP8     slt x4,x2,x3          op 8 SLT: A < B com sinal
+0x0F8     27C0006F          jal x0,636            
+0x0FC     00000013          addi x0,x0,0          
+0x100     00000013          addi x0,x0,0          
+0x104     00313233  OP9     sltu x4,x2,x3         op 9 SLTU: A < B sem sinal
+0x108     26C0006F          jal x0,620            
+0x10C     00000013          addi x0,x0,0          
+0x110     00000013          addi x0,x0,0          
+0x114     00510213  OP10    addi x4,x2,5          op 10 ADDI: A + 5
+0x118     25C0006F          jal x0,604            
+0x11C     00000013          addi x0,x0,0          
+0x120     00000013          addi x0,x0,0          
+0x124     FFF14213  OP11    xori x4,x2,-1         op 11 XORI: A ^ -1 (NOT A)
+0x128     24C0006F          jal x0,588            
+0x12C     00000013          addi x0,x0,0          
+0x130     00000013          addi x0,x0,0          
+0x134     00411213  OP12    slli x4,x2,4          op 12 SLLI: A << 4
+0x138     23C0006F          jal x0,572            
+0x13C     00000013          addi x0,x0,0          
+0x140     00000013          addi x0,x0,0          
+0x144     00415213  OP13    srli x4,x2,4          op 13 SRLI: A >> 4 logico
+0x148     22C0006F          jal x0,556            
+0x14C     00000013          addi x0,x0,0          
+0x150     00000013          addi x0,x0,0          
+0x154     40415213  OP14    srai x4,x2,4          op 14 SRAI: A >> 4 aritmetico
+0x158     21C0006F          jal x0,540            
+0x15C     00000013          addi x0,x0,0          
+0x160     00000013          addi x0,x0,0          
+0x164     00513213  OP15    sltiu x4,x2,5         op 15 SLTIU: A < 5 sem sinal
+0x168     20C0006F          jal x0,524            
+0x16C     00000013          addi x0,x0,0          
+0x170     00000013          addi x0,x0,0          
+0x174     05517213  OP16    andi x4,x2,85         op 16 ANDI: A & 0x55
+0x178     1FC0006F          jal x0,508            
+0x17C     00000013          addi x0,x0,0          
+0x180     00000013          addi x0,x0,0          
+0x184     2A016213  OP17    ori x4,x2,672         op 17 ORI: A | 0x2A0
+0x188     1EC0006F          jal x0,492            
+0x18C     00000013          addi x0,x0,0          
+0x190     00000013          addi x0,x0,0          
+0x194     FFB12213  OP18    slti x4,x2,-5         op 18 SLTI: A < -5 com sinal
+0x198     1DC0006F          jal x0,476            
+0x19C     00000013          addi x0,x0,0          
+0x1A0     00000013          addi x0,x0,0          
+0x1A4     12345237  OP19    lui x4,74565          op 19 LUI: constante 0x12345000
+0x1A8     1CC0006F          jal x0,460            
+0x1AC     00000013          addi x0,x0,0          
+0x1B0     00000013          addi x0,x0,0          
+0x1B4     00001217  OP20    auipc x4,1            op 20 AUIPC: PC da instrucao + 0x1000
+0x1B8     1BC0006F          jal x0,444            
+0x1BC     00000013          addi x0,x0,0          
+0x1C0     00000013          addi x0,x0,0          
+0x1C4     10060203  OP21    lb x4,256(x12)        op 21 LB: byte B[1:0] de 0x8765F0A1, com sinal
+0x1C8     1AC0006F          jal x0,428            
+0x1CC     00000013          addi x0,x0,0          
+0x1D0     00000013          addi x0,x0,0          
+0x1D4     10071203  OP22    lh x4,256(x14)        op 22 LH: metade B[1] de 0x8765F0A1, com sinal
+0x1D8     19C0006F          jal x0,412            
+0x1DC     00000013          addi x0,x0,0          
+0x1E0     00000013          addi x0,x0,0          
+0x1E4     10002203  OP23    lw x4,256(x0)         op 23 LW: palavra 0x8765F0A1
+0x1E8     18C0006F          jal x0,396            
+0x1EC     00000013          addi x0,x0,0          
+0x1F0     00000013          addi x0,x0,0          
+0x1F4     10064203  OP24    lbu x4,256(x12)       op 24 LBU: byte B[1:0] de 0x8765F0A1, sem sinal
+0x1F8     17C0006F          jal x0,380            
+0x1FC     00000013          addi x0,x0,0          
+0x200     00000013          addi x0,x0,0          
+0x204     10075203  OP25    lhu x4,256(x14)       op 25 LHU: metade B[1] de 0x8765F0A1, sem sinal
+0x208     16C0006F          jal x0,364            
+0x20C     00000013          addi x0,x0,0          
+0x210     00000013          addi x0,x0,0          
+0x214     10D02223  OP26    sw x13,260(x0)        op 26 SB: 0x11223344 com o byte B[1:0] trocado por A[7:0]
+0x218     10260223          sb x2,260(x12)        
+0x21C     10402203          lw x4,260(x0)         
+0x220     1540006F          jal x0,340            
+0x224     10D02223  OP27    sw x13,260(x0)        op 27 SH: 0x11223344 com a metade B[1] trocada por A[15:0]
+0x228     10271223          sh x2,260(x14)        
+0x22C     10402203          lw x4,260(x0)         
+0x230     1440006F          jal x0,324            
+0x234     10202223  OP28    sw x2,260(x0)         op 28 SW: grava A e le de volta
+0x238     10402203          lw x4,260(x0)         
+0x23C     1380006F          jal x0,312            
+0x240     00000013          addi x0,x0,0          
+0x244     0080026F  OP29    jal x4,8              op 29 JAL: endereco de retorno (PC+4)
+0x248     00000213          addi x4,x0,0          pulada pelo JAL
+0x24C     1280006F          jal x0,296            
+0x250     00000013          addi x0,x0,0          
+0x254     00000797  OP30    auipc x15,0           op 30 JALR: endereco de retorno (PC+4)
+0x258     00C78267          jalr x4,x15,12        
+0x25C     00000213          addi x4,x0,0          pulada pelo JALR
+0x260     1140006F          jal x0,276            
+0x264     00010233  OP31    add x4,x2,x0          op 31 (mostra A): valor de A
+0x268     10C0006F          jal x0,268            
+0x26C     00000013          addi x0,x0,0          
+0x270     00000013          addi x0,x0,0          
+0x274     00100213  OP32    addi x4,x0,1          op 32 BEQ: 1 se A = B
+0x278     00310463          beq x2,x3,8           
+0x27C     00000213          addi x4,x0,0          pulada se o branch for tomado
+0x280     0F40006F          jal x0,244            
+0x284     00100213  OP33    addi x4,x0,1          op 33 BNE: 1 se A != B
+0x288     00311463          bne x2,x3,8           
+0x28C     00000213          addi x4,x0,0          
+0x290     0E40006F          jal x0,228            
+0x294     00100213  OP34    addi x4,x0,1          op 34 BLT: 1 se A < B com sinal
+0x298     00314463          blt x2,x3,8           
+0x29C     00000213          addi x4,x0,0          
+0x2A0     0D40006F          jal x0,212            
+0x2A4     00100213  OP35    addi x4,x0,1          op 35 BGE: 1 se A >= B com sinal
+0x2A8     00315463          bge x2,x3,8           
+0x2AC     00000213          addi x4,x0,0          
+0x2B0     0C40006F          jal x0,196            
+0x2B4     00100213  OP36    addi x4,x0,1          op 36 BLTU: 1 se A < B sem sinal
+0x2B8     00316463          bltu x2,x3,8          
+0x2BC     00000213          addi x4,x0,0          
+0x2C0     0B40006F          jal x0,180            
+0x2C4     00100213  OP37    addi x4,x0,1          op 37 BGEU: 1 se A >= B sem sinal
+0x2C8     00317463          bgeu x2,x3,8          
+0x2CC     00000213          addi x4,x0,0          
+0x2D0     0A40006F          jal x0,164            
+0x2D4     00018233  OP38    add x4,x3,x0          op 38 (mostra B): valor de B
+0x2D8     09C0006F          jal x0,156            
+0x2DC     00000013          addi x0,x0,0          
+0x2E0     00000013          addi x0,x0,0          
+0x2E4     00000213  OP39    addi x4,x0,0          op 39 (livre): resultado 0
+0x2E8     08C0006F          jal x0,140            
+0x2EC     00000013          addi x0,x0,0          
+0x2F0     00000013          addi x0,x0,0          
+0x2F4     00000213  OP40    addi x4,x0,0          op 40 (livre): resultado 0
+0x2F8     07C0006F          jal x0,124            
+0x2FC     00000013          addi x0,x0,0          
+0x300     00000013          addi x0,x0,0          
+0x304     00000213  OP41    addi x4,x0,0          op 41 (livre): resultado 0
+0x308     06C0006F          jal x0,108            
+0x30C     00000013          addi x0,x0,0          
+0x310     00000013          addi x0,x0,0          
+0x314     00000213  OP42    addi x4,x0,0          op 42 (livre): resultado 0
+0x318     05C0006F          jal x0,92             
+0x31C     00000013          addi x0,x0,0          
+0x320     00000013          addi x0,x0,0          
+0x324     00000213  OP43    addi x4,x0,0          op 43 (livre): resultado 0
+0x328     04C0006F          jal x0,76             
+0x32C     00000013          addi x0,x0,0          
+0x330     00000013          addi x0,x0,0          
+0x334     00000213  OP44    addi x4,x0,0          op 44 (livre): resultado 0
+0x338     03C0006F          jal x0,60             
+0x33C     00000013          addi x0,x0,0          
+0x340     00000013          addi x0,x0,0          
+0x344     00000213  OP45    addi x4,x0,0          op 45 (livre): resultado 0
+0x348     02C0006F          jal x0,44             
+0x34C     00000013          addi x0,x0,0          
+0x350     00000013          addi x0,x0,0          
+0x354     00000213  OP46    addi x4,x0,0          op 46 (livre): resultado 0
+0x358     01C0006F          jal x0,28             
+0x35C     00000013          addi x0,x0,0          
+0x360     00000013          addi x0,x0,0          
+0x364     00000213  OP47    addi x4,x0,0          op 47 (livre): resultado 0
+0x368     00C0006F          jal x0,12             
+0x36C     00000013          addi x0,x0,0          
+0x370     00000013          addi x0,x0,0          
+0x374     004A2403  OUT     lw x8,4(x20)          botoes de novo
+0x378     00847413          andi x8,x8,8          KEY3
+0x37C     00040663          beq x8,x0,12          KEY3 apertado -> parte de cima
+0x380     004A2423          sw x4,8(x20)          LEDR = resultado[17:0]
+0x384     C99FF06F          jal x0,-872           
+0x388     01225493  ALTO    srli x9,x4,18         resultado[31:18]
+0x38C     009A2423          sw x9,8(x20)          LEDR = resultado[31:18]
+0x390     C8DFF06F          jal x0,-884           
