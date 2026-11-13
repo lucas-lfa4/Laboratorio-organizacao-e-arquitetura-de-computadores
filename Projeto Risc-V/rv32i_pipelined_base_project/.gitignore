@@ -1,11 +1,44 @@
-quartus/*
-!quartus/pl_top.sdc
-!quartus/pl_top_no_pll.sdc
-!quartus/add_to_qsf.txt
-modelsim/*
-!modelsim/golden.txt
-!modelsim/data.hex
-!modelsim/program.hex
-assembler/*
-!assembler/assembler.py
-!assembler/hello.asm
+# =============================================================================
+# Versionamos tudo que e necessario para reproduzir o projeto:
+#   quartus/  : .qpf, .qsf, .sdc, instruction.mif, data.mif
+#   modelsim/ : run_sim.do, program.hex, data.hex, golden.txt
+#   assembler/: assembler.py e os programas .asm
+# Ignoramos apenas artefatos GERADOS por ferramentas.
+# =============================================================================
+
+# ---- Quartus: saidas de compilacao -----------------------------------------
+quartus/db/
+quartus/incremental_db/
+quartus/output_files/
+quartus/simulation/
+quartus/greybox_tmp/
+quartus/*.rpt
+quartus/*.summary
+quartus/*.smsg
+quartus/*.qws
+quartus/*.done
+quartus/*.jdi
+quartus/*.pin
+quartus/*.sof
+quartus/*.pof
+quartus/*.rbf
+quartus/*.bak
+quartus/c5_pin_model_dump.txt
+
+# ---- ModelSim: saidas de simulacao -----------------------------------------
+modelsim/work/
+modelsim/transcript
+modelsim/*.wlf
+modelsim/wlft*
+modelsim/*.vstf
+modelsim/output.txt
+
+# ---- Assembler: arquivos gerados na pasta assembler/ ------------------------
+# (copie para quartus/ ou modelsim/ conforme o uso; ver README)
+assembler/instruction.mif
+assembler/data.mif
+assembler/program.hex
+
+# ---- Python ----------------------------------------------------------------
+__pycache__/
+*.pyc
