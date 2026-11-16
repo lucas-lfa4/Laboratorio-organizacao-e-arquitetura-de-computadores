@@ -1,0 +1,9 @@
+-- data.mif -- calculadora v2 (o programa grava sozinho o que precisa)
+DEPTH = 256;
+WIDTH = 32;
+ADDRESS_RADIX = HEX;
+DATA_RADIX = HEX;
+CONTENT
+BEGIN
+[000..0FF] : 00000000;
+END;
