@@ -52,7 +52,6 @@ module pl_alu_ctrl (
                     3'h0: Operation = 4'd01;                     // ADDI
                     3'h1: Operation = 4'd07;                     // SLLI
                     3'h2: Operation = 4'd11;                     // SLTI
-                    3'h3: Operation = 4'd12;                     // SLTIU
                     3'h4: Operation = 4'd06;                     // XORI
                     3'h5: Operation = Funct7[5] ? 4'd09 : 4'd08; // SRAI ou SRLI
                     3'h6: Operation = 4'd04;                     // ORI

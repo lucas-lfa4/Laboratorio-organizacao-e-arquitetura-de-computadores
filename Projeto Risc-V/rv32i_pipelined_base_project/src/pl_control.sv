@@ -7,7 +7,7 @@
 //
 // Instrucoes suportadas:
 //   R-type  (0110011): add, sub, and, or, xor, sll, srl, sra, slt, sltu
-//   I-type  (0010011): addi, andi, ori, xori, slti, sltiu, slli, srli, srai
+//   I-type  (0010011): addi, andi, ori, xori, slti, slli, srli, srai
 //   U-type  (0110111): lui
 //   U-type  (0010111): auipc
 //   I-type  (0000011): lb, lh, lw, lbu, lhu   (largura escolhida por funct3)
