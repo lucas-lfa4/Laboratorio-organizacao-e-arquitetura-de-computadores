@@ -1,9 +1,0 @@
--- data.mif -- calculadora (nao usa a memoria de dados)
-DEPTH = 256;
-WIDTH = 32;
-ADDRESS_RADIX = HEX;
-DATA_RADIX = HEX;
-CONTENT
-BEGIN
-[000..0FF] : 00000000;
-END;
