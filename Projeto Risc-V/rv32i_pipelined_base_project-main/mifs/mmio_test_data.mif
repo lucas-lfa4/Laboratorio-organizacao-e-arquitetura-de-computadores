@@ -1,0 +1,85 @@
+-- =============================================================================
+-- mmio_test_data.mif
+-- Data Memory initialization — MMIO test program
+--
+-- Word address = byte_address / 4  (sc_dmem usa alu_result[9:2])
+--
+-- Constantes de Phase 1:
+--   word 000  byte  0  : 0x00000400 — MMIO base address
+--   word 001  byte  4  : 0x0002AAAA — LEDR alternating pattern
+--   word 002  byte  8  : 0x00000155 — LEDG alternating pattern
+--   word 003  byte 12  : (SW value escrito em runtime)
+--   word 004  byte 16  : (KEY value escrito em runtime)
+--
+-- Constantes de Phase 3 — TX loop:
+--   word 005  byte 20  : 0x00000200 — tx_busy mask (bit 9 do status UART)
+--   word 006  byte 24  : 0x00000030 — ptr_start (byte 48, primeiro char)
+--   word 007  byte 28  : 0x00000064 — ptr_end   (byte 100, após último char)
+--   word 008  byte 32  : 0x00000004 — step (4 bytes por palavra)
+--
+-- Constantes de Phase 2 — RX wait:
+--   word 009  byte 36  : 0x00000100 — rx_ready mask (bit 8 do status UART)
+--   word 00A  byte 40  : 0x000000FF — rx_data mask  (bits 7:0 do status UART)
+--   word 00B  byte 44  : 0x00000020 — espaço ' ' (byte esperado pelo RX wait)
+--
+-- String "Ola, Mundo!\r\n" (13 chars, words 00C–018):
+--   word 00C  byte 48  : 0x0000004F — 'O'
+--   word 00D  byte 52  : 0x0000006C — 'l'
+--   word 00E  byte 56  : 0x00000061 — 'a'
+--   word 00F  byte 60  : 0x0000002C — ','
+--   word 010  byte 64  : 0x00000020 — ' '
+--   word 011  byte 68  : 0x0000004D — 'M'
+--   word 012  byte 72  : 0x00000075 — 'u'
+--   word 013  byte 76  : 0x0000006E — 'n'
+--   word 014  byte 80  : 0x00000064 — 'd'
+--   word 015  byte 84  : 0x0000006F — 'o'
+--   word 016  byte 88  : 0x00000021 — '!'
+--   word 017  byte 92  : 0x0000000D — CR '\r'
+--   word 018  byte 96  : 0x0000000A — LF '\n'
+--                byte 100 = ptr_end (loop para aqui)
+-- =============================================================================
+
+DEPTH = 256;
+WIDTH = 32;
+ADDRESS_RADIX = HEX;
+DATA_RADIX = HEX;
+
+CONTENT
+BEGIN
+
+-- Phase 1 constants
+000 : 00000400;  -- MMIO base address
+001 : 0002AAAA;  -- LEDR alternating pattern
+002 : 00000155;  -- LEDG alternating pattern
+003 : 00000000;  -- SW value (sobrescrito em runtime)
+004 : 00000000;  -- KEY value (sobrescrito em runtime)
+
+-- Phase 3 TX loop control
+005 : 00000200;  -- tx_busy mask (bit 9)
+006 : 00000030;  -- ptr_start = byte 48 (primeiro char)
+007 : 00000064;  -- ptr_end   = byte 100 (após último char)
+008 : 00000004;  -- step = 4 bytes
+
+-- Phase 2 RX wait
+009 : 00000100;  -- rx_ready mask (bit 8)
+00A : 000000FF;  -- rx_data mask  (bits 7:0)
+00B : 00000020;  -- espaço ' '
+
+-- String "Ola, Mundo!\r\n"
+00C : 0000004F;  -- 'O'
+00D : 0000006C;  -- 'l'
+00E : 00000061;  -- 'a'
+00F : 0000002C;  -- ','
+010 : 00000020;  -- ' '
+011 : 0000004D;  -- 'M'
+012 : 00000075;  -- 'u'
+013 : 0000006E;  -- 'n'
+014 : 00000064;  -- 'd'
+015 : 0000006F;  -- 'o'
+016 : 00000021;  -- '!'
+017 : 0000000D;  -- CR '\r'
+018 : 0000000A;  -- LF '\n'
+
+[019..0FF] : 00000000;
+
+END;

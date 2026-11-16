@@ -45,9 +45,6 @@ module pl_alu_ctrl (
             end
 
             2'b11: begin                // I-type aritmetico: decodificar Funct3
-                // ATENCAO: no I-type, inst[31:25] faz parte do IMEDIATO, nao e
-                // funct7. So em SRLI/SRAI (funct3=101) o bit 30 tem significado
-                // (0 = logico, 1 = aritmetico). Por isso ADDI nunca vira SUB.
                 case (Funct3)
                     3'h0: Operation = 4'd01;                     // ADDI
                     3'h1: Operation = 4'd07;                     // SLLI

@@ -1,0 +1,62 @@
+-- =============================================================================
+-- data.mif — Memória de dados inicial do programa de teste
+--
+-- Parte 1 (lidos pelo teste):
+--   word 000  byte  0 : 0x0000000A = 10   (lido por lw x1 e lw x5)
+--   word 001  byte  4 : 0x00000014 = 20   (lido por lw x2)
+--   word 002  byte  8 : (escrito em runtime: sw x3 = 30)
+--   word 003  byte 12 : (escrito em runtime: sw SW[17:0])
+--   word 004  byte 16 : (escrito em runtime: sw KEY[3:0])
+--
+-- Parte 2 — pisca-pisca LEDG (lidos pelo setup em 02C-02F e 031/036):
+--   word 005  byte 20 : 0x00000400 = base MMIO
+--   word 006  byte 24 : 0x00000055 = padrao LEDG 1 (01010101)
+--   word 007  byte 28 : 0x000000AA = padrao LEDG 2 (10101010)
+--   word 008  byte 32 : 0xFFFFFFFF = -1 (decremento do contador)
+--   word 009  byte 36 : 0x001E8480 = 2.000.000 (delay ~1 s @ 10 MHz)
+--                        5 ciclos/iter x 2.000.000 = 10.000.000 ciclos
+--
+-- Parte 1.5 — UART "HALT!" (lidos por 00C-02B):
+--   word 00A  byte 40 : 0x00000410 = endereco UART TX/status
+--   word 00B  byte 44 : 0x00000200 = tx_busy mask (bit 9 do status)
+--   word 00C  byte 48 : 0x00000048 = 'H'
+--   word 00D  byte 52 : 0x00000041 = 'A'
+--   word 00E  byte 56 : 0x0000004C = 'L'
+--   word 00F  byte 60 : 0x00000054 = 'T'
+--   word 010  byte 64 : 0x00000021 = '!'
+-- =============================================================================
+
+DEPTH = 256;
+WIDTH = 32;
+ADDRESS_RADIX = HEX;
+DATA_RADIX = HEX;
+
+CONTENT
+BEGIN
+
+-- Parte 1
+000 : 0000000A;  -- 10
+001 : 00000014;  -- 20
+002 : 00000000;  -- (escrito em runtime)
+003 : 00000000;  -- (escrito em runtime: SW)
+004 : 00000000;  -- (escrito em runtime: KEY)
+
+-- Parte 2
+005 : 00000400;  -- MMIO base
+006 : 00000055;  -- LEDG padrao 1
+007 : 000000AA;  -- LEDG padrao 2
+008 : FFFFFFFF;  -- -1 (decremento)
+009 : 001E8480;  -- 2.000.000 (delay ~1 s)
+
+-- Parte 1.5
+00A : 00000410;  -- UART TX/status address
+00B : 00000200;  -- tx_busy mask (bit 9)
+00C : 00000048;  -- 'H'
+00D : 00000041;  -- 'A'
+00E : 0000004C;  -- 'L'
+00F : 00000054;  -- 'T'
+010 : 00000021;  -- '!'
+
+[011..0FF] : 00000000;
+
+END;

@@ -10,9 +10,9 @@
 //   I-type  (0010011): addi, andi, ori, xori, slti, slli, srli, srai
 //   U-type  (0110111): lui
 //   U-type  (0010111): auipc
-//   I-type  (0000011): lb, lh, lw, lbu, lhu   (largura escolhida por funct3)
-//   S-type  (0100011): sb, sh, sw             (largura escolhida por funct3)
-//   B-type  (1100011): beq, bne, blt, bge, bltu, bgeu (condicao por funct3)
+//   I-type  (0000011): lb, lh, lw, lbu, lhu   
+//   S-type  (0100011): sb, sh, sw             
+//   B-type  (1100011): beq, bne, blt, bge, bltu, bgeu 
 //   J-type  (1101111): jal
 //   I-type  (1100111): jalr
 //

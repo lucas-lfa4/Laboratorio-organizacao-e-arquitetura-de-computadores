@@ -1,0 +1,141 @@
+-- =============================================================================
+-- instruction.mif — Programa de teste do pipeline RV32I
+--
+-- Parte 1 — exercita instruções suportadas e mecanismos de hazard:
+--
+--   000: lw  x1,  0(x0)    x1 = 10
+--   001: lw  x2,  4(x0)    x2 = 20
+--   002: add x3, x1, x2    x3 = 30   (forwarding MEM/WB->EX)
+--   003: and x4, x3, x1    x4 = 10   (forwarding EX/MEM->EX para x3)
+--   004: lw  x5,  0(x0)    x5 = 10   (causa load-use stall em 005)
+--   005: add x6, x5, x2    x6 = 30   (1 ciclo de stall)
+--   006: sw  x3,  8(x0)    dmem[2] = 30
+--   007: beq x1, x2, +8    NAO tomado (x1=10 != x2=20)
+--   008: add x7, x1, x2    x7 = 30
+--   009: beq x1, x5, +8    TOMADO (x1=x5=10) -> salta 00A, executa 00B
+--   00A: add x8, x0, x0    DESCARTADO (flush de branch)
+--   00B: add x8, x1, x4    x8 = 20
+--
+-- Parte 1.5 — imprime "HALT!" na serial RS-232 (UART MMIO @ 0x410):
+--   x15 = dmem[0xA] = 0x410  (endereco UART TX / status)
+--   x17 = dmem[0xB] = 0x200  (tx_busy mask — bit 9 do status)
+--   x13 = temporario para leitura do status UART
+--   x16 = caracter corrente   (carregado de dmem[0xC..0x10])
+--   Sequencia: 'H'(0x48), 'A'(0x41), 'L'(0x4C), 'T'(0x54), '!'(0x21)
+--
+--   Para cada caracter:
+--     lw  x16, imm(x0)    carrega caracter de dmem
+--     POLL:
+--       lw  x13, 0(x15)   le status UART (leitura do endereco 0x410)
+--       and x13, x13, x17 isola bit 9 (tx_busy)
+--       beq x13, x0, +8   tx_busy==0? salta o loop-back
+--       beq x0,  x0, -12  tx_busy==1? volta a POLL
+--     sw  x16, 0(x15)     transmite caracter
+--
+-- Parte 2 — loop infinito de pisca-pisca nos LEDs verdes (LEDG @ 0x40C):
+--   Alterna entre 0x55 e 0xAA com delay de ~1 segundo entre cada estado.
+--   Delay: 2.000.000 iteracoes x 5 ciclos/iter = 10.000.000 ciclos = 1 s @ 10 MHz
+--
+--   x9  = 0x400  (MMIO base, carregado de dmem[5])
+--   x10 = 0x55   (padrao 1,  carregado de dmem[6])
+--   x11 = 0xAA   (padrao 2,  carregado de dmem[7])
+--   x12 = -1     (decremento, carregado de dmem[8] = 0xFFFFFFFF)
+--   x14 = contador recarregado de dmem[9] = 2.000.000 antes de cada delay
+-- =============================================================================
+
+DEPTH = 256;
+WIDTH = 32;
+ADDRESS_RADIX = HEX;
+DATA_RADIX = HEX;
+
+CONTENT
+BEGIN
+
+-- ---- Parte 1: teste de instrucoes e hazards ---------------------------------
+000 : 00002083;  -- lw  x1,  0(x0)    x1 = 10
+001 : 00402103;  -- lw  x2,  4(x0)    x2 = 20
+002 : 002081B3;  -- add x3, x1, x2    x3 = 30
+003 : 0011F233;  -- and x4, x3, x1    x4 = 10  (0x1E & 0x0A)
+004 : 00002283;  -- lw  x5,  0(x0)    x5 = 10  [load-use stall]
+005 : 00228333;  -- add x6, x5, x2    x6 = 30
+006 : 00302423;  -- sw  x3,  8(x0)    dmem[2] = 30
+007 : 00208463;  -- beq x1, x2, +8    NAO tomado
+008 : 002083B3;  -- add x7, x1, x2    x7 = 30
+009 : 00508463;  -- beq x1, x5, +8    TOMADO -> 00B
+00A : 00000433;  -- add x8, x0, x0    DESCARTADO
+00B : 00408433;  -- add x8, x1, x4    x8 = 20
+
+-- ---- Parte 1.5: impressao "HALT!" na RS-232 (UART @ 0x410) -----------------
+00C : 02802783;  -- lw  x15, 40(x0)   x15 = 0x410 (UART TX/status)
+00D : 02C02883;  -- lw  x17, 44(x0)   x17 = 0x200 (tx_busy mask, bit 9)
+
+-- 'H' (0x48)
+00E : 03002803;  -- lw  x16, 48(x0)   x16 = 'H'
+00F : 0007A683;  -- lw  x13,  0(x15)  le status UART             [POLL_H]
+010 : 011686B3;  -- and x13, x13, x17 isola tx_busy (bit 9)
+011 : 00068463;  -- beq x13, x0,  +8  tx_busy==0? salta loop-back
+012 : FE000AE3;  -- beq x0,  x0, -12  tx_busy==1? -> POLL_H (00F)
+013 : 0107A023;  -- sw  x16,  0(x15)  UART <- 'H'
+
+-- 'A' (0x41)
+014 : 03402803;  -- lw  x16, 52(x0)   x16 = 'A'
+015 : 0007A683;  -- lw  x13,  0(x15)  le status UART             [POLL_A]
+016 : 011686B3;  -- and x13, x13, x17 isola tx_busy (bit 9)
+017 : 00068463;  -- beq x13, x0,  +8  tx_busy==0? salta loop-back
+018 : FE000AE3;  -- beq x0,  x0, -12  tx_busy==1? -> POLL_A (015)
+019 : 0107A023;  -- sw  x16,  0(x15)  UART <- 'A'
+
+-- 'L' (0x4C)
+01A : 03802803;  -- lw  x16, 56(x0)   x16 = 'L'
+01B : 0007A683;  -- lw  x13,  0(x15)  le status UART             [POLL_L]
+01C : 011686B3;  -- and x13, x13, x17 isola tx_busy (bit 9)
+01D : 00068463;  -- beq x13, x0,  +8  tx_busy==0? salta loop-back
+01E : FE000AE3;  -- beq x0,  x0, -12  tx_busy==1? -> POLL_L (01B)
+01F : 0107A023;  -- sw  x16,  0(x15)  UART <- 'L'
+
+-- 'T' (0x54)
+020 : 03C02803;  -- lw  x16, 60(x0)   x16 = 'T'
+021 : 0007A683;  -- lw  x13,  0(x15)  le status UART             [POLL_T]
+022 : 011686B3;  -- and x13, x13, x17 isola tx_busy (bit 9)
+023 : 00068463;  -- beq x13, x0,  +8  tx_busy==0? salta loop-back
+024 : FE000AE3;  -- beq x0,  x0, -12  tx_busy==1? -> POLL_T (021)
+025 : 0107A023;  -- sw  x16,  0(x15)  UART <- 'T'
+
+-- '!' (0x21)
+026 : 04002803;  -- lw  x16, 64(x0)   x16 = '!'
+027 : 0007A683;  -- lw  x13,  0(x15)  le status UART             [POLL_X]
+028 : 011686B3;  -- and x13, x13, x17 isola tx_busy (bit 9)
+029 : 00068463;  -- beq x13, x0,  +8  tx_busy==0? salta loop-back
+02A : FE000AE3;  -- beq x0,  x0, -12  tx_busy==1? -> POLL_X (027)
+02B : 0107A023;  -- sw  x16,  0(x15)  UART <- '!'
+
+-- ---- Parte 2: setup do pisca-pisca ------------------------------------------
+02C : 01402483;  -- lw  x9,  20(x0)   x9  = MMIO base (0x400)
+02D : 01802503;  -- lw  x10, 24(x0)   x10 = 0x55
+02E : 01C02583;  -- lw  x11, 28(x0)   x11 = 0xAA
+02F : 02002603;  -- lw  x12, 32(x0)   x12 = -1 (0xFFFFFFFF)
+
+-- ---- BLINK_START (word 030) --------------------------------------------------
+030 : 00A4A623;  -- sw  x10, 12(x9)   LEDG = 0x55           (addr 0x40C)
+031 : 02402703;  -- lw  x14, 36(x0)   x14 = 2.000.000
+
+-- ---- DELAY1 (word 032) -------------------------------------------------------
+032 : 00C70733;  -- add x14, x14, x12 x14 -= 1
+033 : 00070463;  -- beq x14, x0, +8   x14==0? -> 035 (fim delay)
+034 : FE000CE3;  -- beq x0,  x0, -8   senao  -> 032
+
+-- ---- Segundo estado ----------------------------------------------------------
+035 : 00B4A623;  -- sw  x11, 12(x9)   LEDG = 0xAA           (addr 0x40C)
+036 : 02402703;  -- lw  x14, 36(x0)   x14 = 2.000.000
+
+-- ---- DELAY2 (word 037) -------------------------------------------------------
+037 : 00C70733;  -- add x14, x14, x12 x14 -= 1
+038 : 00070463;  -- beq x14, x0, +8   x14==0? -> 03A (fim delay)
+039 : FE000CE3;  -- beq x0,  x0, -8   senao  -> 037
+
+-- ---- Volta ao inicio do loop -------------------------------------------------
+03A : FC000CE3;  -- beq x0,  x0, -40  -> BLINK_START (030)
+
+[03B..0FF] : 00000013;  -- nop
+
+END;

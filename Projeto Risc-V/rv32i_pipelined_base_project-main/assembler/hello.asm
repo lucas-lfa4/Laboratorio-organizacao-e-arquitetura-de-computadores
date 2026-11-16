@@ -1,0 +1,12 @@
+lw x1,0(x0)
+lw x2,4(x0)
+add x3,x1,x2
+and x4,x3,x1
+lw x5,0(x0)
+add x6,x5,x2
+sw x3,8(x0)
+beq x1,x2,8
+add x7,x1,x2
+beq x1,x5,8
+add x8,x0,x0
+add x8,x1,x4

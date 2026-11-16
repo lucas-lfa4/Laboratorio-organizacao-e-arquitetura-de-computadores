@@ -1,0 +1,11 @@
+quartus/*
+!quartus/pl_top.sdc
+!quartus/pl_top_no_pll.sdc
+!quartus/add_to_qsf.txt
+modelsim/*
+!modelsim/golden.txt
+!modelsim/data.hex
+!modelsim/program.hex
+assembler/*
+!assembler/assembler.py
+!assembler/hello.asm

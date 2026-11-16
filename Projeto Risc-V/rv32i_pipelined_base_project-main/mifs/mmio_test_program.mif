@@ -1,0 +1,110 @@
+-- =============================================================================
+-- mmio_test_program.mif
+-- Instruction test for single-cycle RISC-V with Memory-Mapped I/O (MMIO)
+--
+-- Phase 1 — MMIO peripherals (DE2-115):
+--   0x400  SW[17:0]   read-only   18 slide switches
+--   0x404  KEY[3:0]   read-only    4 push buttons
+--   0x408  LEDR[17:0] write-only  18 red LEDs
+--   0x40C  LEDG[8:0]  write-only   9 green LEDs
+--
+-- Phase 2 — UART RX: aguarda o caractere espaço (0x20)
+--   Lê status da UART em loop; ignora qualquer byte que não seja espaço.
+--   O flag rx_ready (bit 8) é apagado automaticamente ao executar o lw.
+--
+-- Phase 3 — UART TX: transmite "Ola, Mundo!\r\n" (8N1, 9600 baud)
+--   0x410  UART read  -> {22'b0, tx_busy[9], rx_ready[8], rx_data[7:0]}
+--   0x410  UART write -> transmit WriteData[7:0]
+--
+-- Register usage:
+--   x1  = 0x00000400   MMIO base address
+--   x2  = temp         (UART status / operand)
+--   x3  = temp         (LED / rx_ready check / current TX char)
+--   x4  = rx_ready mask 0x100  →  reloaded como tx_busy mask 0x200 no Phase 3
+--   x5  = KEY[3:0]     →  reloaded como rx_data mask 0x0FF no Phase 2
+--   x6  = space char 0x20  →  reloaded como ptr (byte addr) no Phase 3
+--   x7  = step = 4     (Phase 3)
+--   x9  = ptr_end      (Phase 3)
+--
+-- Fluxo Phase 2 (RX wait):
+--   RX_WAIT:
+--     lw  x2, 16(x1)    ; lê status (apaga rx_ready)
+--     and x3, x2, x4    ; isola bit 8 (rx_ready)
+--     beq x3, x0, -8   ; rx_ready==0? volta p/ RX_WAIT
+--     and x2, x2, x5    ; x2 = rx_data[7:0]
+--     sub x2, x2, x6    ; rx_data − espaço
+--     beq x2, x0, +8   ; igual? avança p/ Phase 3
+--     beq x0, x0, -24  ; diferente? volta p/ RX_WAIT
+--
+-- Fluxo Phase 3 (TX loop):
+--   LOOP:
+--     beq x6, x9, +36  ; ponteiro == fim? → EXIT
+--     lw  x3, 0(x6)    ; carrega byte atual
+--     POLL:
+--       lw  x2, 16(x1) ; lê status UART
+--       and x2, x2, x4 ; isola tx_busy (bit 9)
+--       beq x2, x0, +8 ; livre? pula loop-back
+--       beq x0, x0,-12 ; ocupado? volta p/ POLL
+--     sw  x3, 16(x1)   ; transmite byte
+--     add x6, x6, x7   ; avança ponteiro
+--     beq x0, x0, -32 ; → LOOP
+--   EXIT:
+--     beq x0, x0, 0    ; halt
+-- =============================================================================
+
+DEPTH = 256;
+WIDTH = 32;
+ADDRESS_RADIX = HEX;
+DATA_RADIX = HEX;
+
+CONTENT
+BEGIN
+
+-- ---- Phase 1: LED / SW / KEY test -----------------------------------------
+000 : 00002083;  -- lw  x1,  0(x0)    x1 = 0x400              (MMIO base)
+001 : 00402103;  -- lw  x2,  4(x0)    x2 = LEDR alt. pattern
+002 : 00802183;  -- lw  x3,  8(x0)    x3 = LEDG alt. pattern
+003 : 0020A423;  -- sw  x2,  8(x1)    LEDR[17:0] = pattern    (addr 0x408)
+004 : 0030A623;  -- sw  x3, 12(x1)    LEDG[8:0]  = pattern    (addr 0x40C)
+005 : 0000A203;  -- lw  x4,  0(x1)    x4 = SW[17:0]           (addr 0x400)
+006 : 0040A283;  -- lw  x5,  4(x1)    x5 = KEY[3:0]           (addr 0x404)
+007 : 00402623;  -- sw  x4, 12(x0)    dmem[3] = SW value
+008 : 00502823;  -- sw  x5, 16(x0)    dmem[4] = KEY value
+
+-- ---- Phase 2: UART RX — aguarda espaço ------------------------------------
+009 : 02402203;  -- lw  x4, 36(x0)    x4 = 0x100  (rx_ready mask, bit 8)
+00A : 02802283;  -- lw  x5, 40(x0)    x5 = 0x0FF  (rx_data mask, bits 7:0)
+00B : 02C02303;  -- lw  x6, 44(x0)    x6 = 0x020  (espaço ' ')
+
+-- RX_WAIT (addr 00C):
+00C : 0100A103;  -- lw  x2, 16(x1)    lê status UART          [RX_WAIT]
+00D : 004171B3;  -- and x3, x2, x4    isola rx_ready (bit 8)
+00E : FE018CE3;  -- beq x3, x0, -8   rx_ready==0? → RX_WAIT
+00F : 00517133;  -- and x2, x2, x5    x2 = rx_data[7:0]
+010 : 40610133;  -- sub x2, x2, x6    rx_data − espaço
+011 : 00010463;  -- beq x2, x0, +8   igual a espaço? → TX setup
+012 : FE0004E3;  -- beq x0, x0, -24  diferente? → RX_WAIT
+
+-- ---- Phase 3: UART TX setup -----------------------------------------------
+013 : 01402203;  -- lw  x4, 20(x0)    x4 = 0x200  (tx_busy mask, bit 9)
+014 : 01802303;  -- lw  x6, 24(x0)    x6 = ptr_start  (byte addr do 1º char)
+015 : 01C02483;  -- lw  x9, 28(x0)    x9 = ptr_end    (byte addr após último)
+016 : 02002383;  -- lw  x7, 32(x0)    x7 = 4          (step em bytes)
+
+-- ---- Phase 3: UART TX loop -------------------------------------------------
+017 : 02930263;  -- beq x6, x9, +36   tudo enviado? → EXIT     [LOOP_START]
+018 : 00032183;  -- lw  x3,  0(x6)    carrega byte atual
+019 : 0100A103;  -- lw  x2, 16(x1)    lê status UART           [POLL]
+01A : 00417133;  -- and x2, x2, x4    isola tx_busy (bit 9)
+01B : 00010463;  -- beq x2, x0, +8   tx_busy==0? pula loop-back
+01C : FE000AE3;  -- beq x0, x0, -12  tx_busy==1? → POLL
+01D : 0030A823;  -- sw  x3, 16(x1)   transmite byte           (addr 0x410)
+01E : 00730333;  -- add x6, x6, x7    avança ponteiro
+01F : FE0000E3;  -- beq x0, x0, -32  → LOOP_START
+
+-- ---- EXIT ------------------------------------------------------------------
+020 : 00000063;  -- beq x0, x0, 0     halt
+
+[021..0FF] : 00000013;  -- nop
+
+END;
