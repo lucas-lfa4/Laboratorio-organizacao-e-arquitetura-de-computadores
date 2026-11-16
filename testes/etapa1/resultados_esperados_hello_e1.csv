@@ -1,0 +1,13 @@
+Instrucao;Operacao;Resultado (decimal);Resultado (hex);Destino
+addi x1, x0, 42;0 + 42;42;0x2A;dmem[0]
+andi x2, x10, 12;10 & 12;8;0x8;dmem[1]
+ori x3, x10, 5;10 | 5;15;0xF;dmem[2]
+slti x4, x12, 0;-16 < 0;1;0x1;dmem[3]
+slli x5, x10, 2;10 << 2;40;0x28;dmem[4]
+srli x6, x12, 4;-16 >> 4 (logico);268435455;0xFFFFFFF;dmem[5]
+srai x7, x12, 2;-16 >> 2 (aritmetico);-4;0xFFFFFFFC;dmem[6]
+xor x1, x10, x13;10 ^ 6;12;0xC;dmem[7]
+sll x2, x10, x11;10 << 3;80;0x50;dmem[8]
+srl x3, x12, x11;-16 >> 3 (logico);536870910;0x1FFFFFFE;dmem[9]
+sra x4, x12, x11;-16 >> 3 (aritmetico);-2;0xFFFFFFFE;dmem[10]
+sltu x5, x10, x12;10 < 0xFFFFFFF0 (sem sinal);1;0x1;dmem[11]
