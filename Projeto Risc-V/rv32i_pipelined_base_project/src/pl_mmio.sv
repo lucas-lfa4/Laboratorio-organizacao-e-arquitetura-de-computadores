@@ -52,7 +52,7 @@ module pl_mmio (
     logic [7:0]  tx_byte;       // byte corrente entregue a UART
 
     pl_uart #(
-        .CLK_HZ (50_000_000),
+        .CLK_HZ (10_000_000),
         .BAUD   (9_600)
     ) uart_inst (
         .clk      (clk),
