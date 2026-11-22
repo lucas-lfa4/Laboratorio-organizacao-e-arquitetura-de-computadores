@@ -8,7 +8,7 @@ Projeto final de **CIN0012 – Laboratório de Organização e Arquitetura de Co
 
 Implementação, em SystemVerilog, de um processador **RISC-V RV32I com pipeline de 5 estágios**, executado em simulação (ModelSim) e na placa FPGA **DE2-115**.
 
-O ponto de partida foi o [projeto base](https://gitlab.com/jualabs-teaching/oac/rv32i_pipelined_base_project) fornecido pelos professores, baseado no livro de Patterson & Hennessy, que executava apenas 8 instruções.
+O ponto de partida foi o [projeto base](https://gitlab.com/jualabs-teaching/oac/rv32i_pipelined_base_project) fornecido pelo professor Victor Medeiros, baseado no livro de Patterson & Hennessy, que executava apenas 8 instruções.
 
 ## 🎯 Objetivo
 
@@ -118,7 +118,7 @@ busca   decodifica  executa  memória  escreve
 ### 🔧 Outras correções
 
 - **`pl_mmio.sv`:** o sinal `tx_byte` era usado antes de ser declarado, o que gerava erro no ModelSim. A declaração foi movida.
-- **`pl_mmio.sv`:** a UART estava configurada para 50 MHz, mas o processador roda a 10 MHz, e a serial saía a 1920 baud. Corrigimos para `CLK_HZ = 10_000_000`, e ela voltou a 9600 baud.
+- **`pl_mmio.sv`:** a UART estava configurada para 50 MHz, mas o processador roda a 10 MHz, e a serial saía a 1920 baud. Corrigimos para `CLK_HZ = 10_000_000`, e ela voltou a 9600 baud. Outra solução para esse problema seria mudar o arquivo top no quartus do pl_top.sv para o pl_top_no_ppl.sv.
 
 ## ✅ Testes e Resultados
 
