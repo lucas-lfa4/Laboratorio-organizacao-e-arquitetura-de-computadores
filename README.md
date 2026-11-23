@@ -127,7 +127,7 @@ busca   decodifica  executa  memória  escreve
 | `hello_e1.asm` | professores | R-type e I-type | ✅ PASS | ✅ correto |
 | `hello_e2.asm` | professores | loads, stores, U-type, branches, jumps | ✅ PASS | ✅ correto |
 
-Os valores esperados vieram das planilhas dos professores e de um simulador de referência escrito à parte, e não do próprio processador.
+Os valores esperados vieram das planilhas dos professores.
 
 ### hello_e1 na placa
 
