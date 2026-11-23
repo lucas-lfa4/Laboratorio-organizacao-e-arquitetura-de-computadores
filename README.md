@@ -1,4 +1,4 @@
-# Processador RISC-V RV32I com Pipeline
+# Relatório do Projeto Final - Processador RISC-V RV32I com Pipeline
 
 Projeto final de CIN0012, Laboratório de Organização e Arquitetura de Computadores (CIn/UFPE, 2026.2).
 
